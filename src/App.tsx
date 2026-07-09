@@ -802,6 +802,30 @@ export default function App() {
               </div>
             </h1>
 
+            {/* ══ INTERACTIVE KEY ACTIONS TAGLINE ══ */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 font-mono text-[10px] sm:text-xs tracking-[3px] uppercase mb-8 font-extrabold select-none">
+              <button 
+                onClick={() => scrollToSection('generator')}
+                className="text-g hover:text-white hover:bg-g/10 hover:border-g/50 transition-all border border-g/20 bg-g/5 px-3 py-1.5 cursor-pointer rounded-sm"
+              >
+                CREATE
+              </button>
+              <span className="text-white/20 font-sans">•</span>
+              <button 
+                onClick={() => scrollToSection('presale')}
+                className="text-cyan hover:text-white hover:bg-cyan/10 hover:border-cyan/50 transition-all border border-cyan/20 bg-cyan/5 px-3 py-1.5 cursor-pointer rounded-sm"
+              >
+                LAUNCH
+              </button>
+              <span className="text-white/20 font-sans">•</span>
+              <button 
+                onClick={() => scrollToSection('forge')}
+                className="text-r hover:text-white hover:bg-r/10 hover:border-r/50 transition-all border border-r/20 bg-r/5 px-3 py-1.5 cursor-pointer rounded-sm"
+              >
+                DOMINATE
+              </button>
+            </div>
+
             <p className="text-sm sm:text-base md:text-lg text-[#c8e6d2]/80 leading-relaxed max-w-[540px] mb-10 font-bold">
               {t(
                 'Zaawansowany agregator płynności nowej generacji i ultra-szybki silnik transakcyjny na Solana SVM.',
@@ -997,11 +1021,18 @@ export default function App() {
             <motion.div 
               animate={{ y: [0, -12, 0] }}
               transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-              className="relative w-[180px] sm:w-[210px] flex flex-col items-center group-hover:scale-105 transition-transform duration-500"
+              onClick={() => {
+                scrollToSection('generator');
+                setTimeout(() => {
+                  window.dispatchEvent(new CustomEvent('trigger-mascot-prompt'));
+                }, 400);
+              }}
+              className="relative w-[180px] sm:w-[210px] flex flex-col items-center group-hover:scale-105 transition-transform duration-500 cursor-pointer active:scale-95"
+              title={t('Kliknij mnie, aby stworzyć token o pieskach!', 'Click me to generate a token about dogs!')}
             >
               {/* Retro HUD speech bubble */}
               <div className="absolute -top-12 bg-g/10 border border-g/30 px-3 py-1 text-[9px] text-g font-bold tracking-[1.5px] select-none font-mono text-center z-10 whitespace-nowrap shadow-[0_0_15px_rgba(0,255,136,0.25)] rounded-sm">
-                {t('STWÓRZ SWÓJ TOKEN AI!', 'CREATE YOUR AI TOKEN!')}
+                {t('KLIKNIJ MNIE: PROMPT AI!', 'CLICK ME: AI PROMPT!')}
                 <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-[#04080f] border-r border-b border-g/30 rotate-45" />
               </div>
               <SlicedAsset asset="main-pose" className="w-full h-auto drop-shadow-[0_0_40px_rgba(0,255,136,0.35)]" />

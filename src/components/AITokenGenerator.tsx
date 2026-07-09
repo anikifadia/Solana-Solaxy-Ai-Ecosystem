@@ -5,6 +5,7 @@ import {
   Copy, Terminal, Check, Loader2, Play, Info, CheckCircle2, Cpu, Activity
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
+import TokenLifecyclePipeline from './TokenLifecyclePipeline';
 
 interface GeneratedToken {
   name: string;
@@ -37,6 +38,22 @@ export default function AITokenGenerator() {
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
   const [deployStepIndex, setDeployStepIndex] = useState<number>(-1);
   const [deployProgress, setDeployProgress] = useState<number>(0);
+
+  // Mascot trigger effect to auto-fill and auto-generate a meme token about dogs
+  React.useEffect(() => {
+    const handleMascotTrigger = (e: Event) => {
+      const defaultPrompt = language === 'pl' 
+        ? "Create a meme token about dogs with 1.5% tax" 
+        : "Create a meme token about dogs with 1.5% tax";
+      setPrompt(defaultPrompt);
+      handleGenerate(defaultPrompt);
+    };
+
+    window.addEventListener('trigger-mascot-prompt', handleMascotTrigger);
+    return () => {
+      window.removeEventListener('trigger-mascot-prompt', handleMascotTrigger);
+    };
+  }, [language, prompt]);
 
   const deploySteps = [
     { labelPl: "Inicjalizacja RPC", labelEn: "RPC Connection", pct: 15 },
@@ -646,6 +663,14 @@ export default function AITokenGenerator() {
 
             </div>
 
+          </div>
+
+          {/* Active 11-step Solaxy token launch pipeline representation */}
+          <div className="mt-6 border-t border-white/5 pt-6">
+            <TokenLifecyclePipeline 
+              activeStepIdx={isDeploying ? Math.min(5 + deployStepIndex, 10) : (deploySuccess ? 10 : -1)} 
+              isDeploying={isDeploying} 
+            />
           </div>
 
         </div>
