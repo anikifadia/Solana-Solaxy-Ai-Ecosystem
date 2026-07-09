@@ -8,6 +8,7 @@ import {
   Sparkles 
 } from 'lucide-react';
 import MempoolStream from './MempoolStream';
+import TokenHDIcon from './TokenHDIcon';
 
 interface SwapPageProps {
   t: (pl: string, en: string) => string;
@@ -91,9 +92,12 @@ export default function SwapPage({
                   >
                     <div className="flex-1 w-full">
                       <div className="flex items-center gap-3 mb-2">
-                        <div className={`p-2 bg-gradient-to-br ${tok.colorGradient} bg-clip-text text-transparent border border-g/20 rounded-none`}>
-                          <IconComponent className="w-5 h-5 text-g" />
-                        </div>
+                        <TokenHDIcon 
+                          ticker={tok.ticker} 
+                          iconType={tok.iconType} 
+                          colorGradient={tok.colorGradient} 
+                          size="md"
+                        />
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-display text-sm text-white tracking-[1px] uppercase">{tok.name}</span>
@@ -170,10 +174,18 @@ export default function SwapPage({
                 </div>
               ) : (
                 <div className="flex flex-col gap-5">
-                  <div className="p-3 bg-cyan/5 border border-cyan/20">
-                    <div className="text-[10px] text-cyan/60 uppercase tracking-[1px] mb-1">{t('Wybrany Token:', 'Selected Token:')}</div>
-                    <div className="flex justify-between items-center">
+                  <div className="p-3 bg-cyan/5 border border-cyan/20 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] text-cyan/60 uppercase tracking-[1px] mb-1">{t('Wybrany Token:', 'Selected Token:')}</div>
                       <span className="font-display text-xs text-white font-bold">{selectedTokenForTrade.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TokenHDIcon 
+                        ticker={selectedTokenForTrade.ticker} 
+                        iconType={selectedTokenForTrade.iconType} 
+                        colorGradient={selectedTokenForTrade.colorGradient} 
+                        size="sm" 
+                      />
                       <span className="font-mono text-xs text-cyan bg-cyan/5 border border-cyan/30 px-2 py-0.5">{selectedTokenForTrade.ticker}</span>
                     </div>
                   </div>

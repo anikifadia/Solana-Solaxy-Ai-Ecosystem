@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import TokenLifecyclePipeline from './TokenLifecyclePipeline';
+import TokenHDIcon from './TokenHDIcon';
 
 interface GeneratedToken {
   name: string;
@@ -407,9 +408,12 @@ export default function AITokenGenerator() {
                 
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 flex items-center justify-center border border-white/20 bg-gradient-to-r ${token.colorGradient} text-black font-black rounded-full`}>
-                      <RenderedIcon className="w-6 h-6 text-black" />
-                    </div>
+                    <TokenHDIcon 
+                      ticker={token.ticker} 
+                      iconType={token.iconType} 
+                      colorGradient={token.colorGradient} 
+                      size="lg"
+                    />
                     <div>
                       <div className="text-sm font-bold text-white tracking-[1px]">{token.name}</div>
                       <div className="text-[10px] text-white/50 tracking-[2px]">{token.ticker}</div>
@@ -670,6 +674,7 @@ export default function AITokenGenerator() {
             <TokenLifecyclePipeline 
               activeStepIdx={isDeploying ? Math.min(5 + deployStepIndex, 10) : (deploySuccess ? 10 : -1)} 
               isDeploying={isDeploying} 
+              token={token}
             />
           </div>
 

@@ -237,9 +237,122 @@ export const PIPELINE_STEPS: PipelineStep[] = [
 interface TokenLifecyclePipelineProps {
   activeStepIdx: number; // Current deploy index or overall step
   isDeploying: boolean;  // Whether currently emitting
+  token?: any | null;    // Dynamic token context
 }
 
-export default function TokenLifecyclePipeline({ activeStepIdx, isDeploying }: TokenLifecyclePipelineProps) {
+function getDynamicTelemetry(stepId: string, token: any, defaultMockJson: any) {
+  if (!token) return defaultMockJson;
+
+  const tickerClean = (token.ticker || '$TOKEN').replace('$', '');
+  const nameClean = (token.name || 'Token').replace(/[^a-zA-Z0-9]/g, '');
+
+  switch (stepId) {
+    case 'prompt':
+      return {
+        "nlp_engine": "Gemini-3.5-Solaxy-NLP-v9",
+        "sentiment_score": 0.9992,
+        "input_prompt_length": (token.description || "").length + 15,
+        "detected_motifs": [
+          "meme_coin",
+          (token.colorGradient || "").includes('g') ? 'solana_green' : 'cyber_cyan',
+          "deflationary",
+          "fair_launch"
+        ],
+        "token_mood": "hyper_bullish",
+        "semantic_integrity": "99.8%"
+      };
+    case 'analysis':
+      return {
+        "competitor_analysis": "COMPLETED - NO DIRECT MATCH",
+        "market_gap_discovered": "High potential meme-narrative",
+        "target_audience": (token.description || "").toLowerCase().match(/(kot|dog|pies|cat|doge|puppy)/) ? "Solana Degens & Animal Lovers" : "DeFi Yield & Staking Community",
+        "virality_coefficient": "x28.4_hype_amplifier",
+        "dynamic_shill_score": "99.4%",
+        "market_sentiment": "OPTIMISTIC"
+      };
+    case 'branding':
+      return {
+        "asset_type": "Solaxy_HD_Vector_SVG_Engine_v2",
+        "color_palette_gradient": token.colorGradient || "from-g to-cyan",
+        "glow_intensity_rating": "9.8/10",
+        "icon_type_resolved": token.iconType || "Coins",
+        "app_icon_render_time": "8.4ms",
+        "dimensions": "1024x1024px HD"
+      };
+    case 'tokenomics':
+      return {
+        "total_supply": token.supply || 1000000000,
+        "liquidity_allocation_pct": "80.00%",
+        "liquidity_allocation_tokens": Math.floor((token.supply || 1000000000) * 0.8),
+        "marketing_burn_tax": "1.50% (Auto-Burn on Transfer)",
+        "team_dev_allocation": "0.00% (No Dev Dump Guarantee)",
+        "liquidity_lock_duration": "PERPETUAL (Permanently Burned LP)"
+      };
+    case 'contract':
+      return {
+        "anchor_version": "Anchor_v0.29.0",
+        "compiler_target": "BPF_Solana_SVM_v3",
+        "optimization_level": "Codegen optimized (O3)",
+        "lines_of_rust_code": (token.anchorCode || "").split('\n').length,
+        "security_score_certik": "100.00/100.00 (Flawless Audit)",
+        "custom_mechanics_enabled": ["StakingRewards", "AutoBurn", "TaxDistribution"]
+      };
+    case 'deployment':
+      return {
+        "program_address": `SLX${tickerClean}vH1Y9x3Lp${tickerClean}eWks`,
+        "sol_rent_exemption_fee": "0.01482 SOL",
+        "epoch_at_deployment": 612,
+        "gas_used_lamports": 458000,
+        "transaction_signature": "5fG49s61Xj8GvA1h9x3Lp0sW7mQ91hN8zKqPx9a2fB81c",
+        "confirmation_state": "finalized_on_chain"
+      };
+    case 'liquidity':
+      return {
+        "amm_pool_mechanism": "Solaxy_Constant_Product_V2",
+        "paired_asset_sol": "10.0 SOL",
+        "paired_token_supply": Math.floor((token.supply || 1000000000) * 0.8),
+        "lp_token_address": `LP_${tickerClean}SOL_92HjKp99`,
+        "liquidity_pool_status": "LOCKED_AND_BURNED",
+        "slippage_resistance": "99.94%"
+      };
+    case 'webspace':
+      return {
+        "website_subdomain": `https://${(token.name || 'token').toLowerCase().replace(/[^a-z0-9]/g, '')}.solaxy.dex`,
+        "hosting_nodes": ["IPFS_Decentralized", "Arweave_Permanent"],
+        "ssl_certificate": "active_lets_encrypt_v2",
+        "live_trading_widget": "ENABLED",
+        "integrated_charting": "TRADINGVIEW_SVM"
+      };
+    case 'socials':
+      return {
+        "tweet_broadcast_status": "SENT_AUTOMATIC",
+        "tweet_payload_chars": 234,
+        "telegram_broadcast_channel_id": "@SolaxyDEX_New_Launches",
+        "automated_reddit_shill": "completed_on_r/solana",
+        "estimated_hype_impressions": "28,500+ (Extreme exposure)"
+      };
+    case 'dexlisting':
+      return {
+        "solaxy_dex_listing_id": `SLX_DIR_${tickerClean}_DEX`,
+        "api_index_sync_status": "synced_fully",
+        "search_keywords": ["meme", "ai_forged", tickerClean.toLowerCase(), "solaxy_ecosystem"],
+        "dex_trading_pairs": [`${token.ticker || '$TOKEN'}/SOL`],
+        "orderbook_initialized": "true"
+      };
+    case 'governance':
+      return {
+        "admin_console_access": "OWNER_AUTHORIZED",
+        "holder_charts": "live_real_time",
+        "staking_yield_apy": "164.8% (Dynamic)",
+        "burn_mechanism_status": "ACTIVE",
+        "dev_wallet_balance": "0.00 $SLX"
+      };
+    default:
+      return defaultMockJson;
+  }
+}
+
+export default function TokenLifecyclePipeline({ activeStepIdx, isDeploying, token }: TokenLifecyclePipelineProps) {
   const { t, language } = useLanguage();
   const [selectedStepIdx, setSelectedStepIdx] = useState<number>(0);
 
@@ -378,7 +491,7 @@ export default function TokenLifecyclePipeline({ activeStepIdx, isDeploying }: T
 
             <div className="flex-1 overflow-y-auto text-[9.5px] leading-relaxed text-cyan/80 p-1 select-text scrollbar-thin scrollbar-thumb-white/15 scrollbar-track-transparent max-h-[140px]">
               <pre className="whitespace-pre-wrap font-mono">
-                {JSON.stringify(selectedStep.mockJson, null, 2)}
+                {JSON.stringify(getDynamicTelemetry(selectedStep.id, token, selectedStep.mockJson), null, 2)}
               </pre>
             </div>
 
