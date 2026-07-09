@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useLanguage } from '../LanguageContext';
+import MASCOT_HERO from '../assets/images/solaxy_mascot_hero_1783437956325.jpg';
 
 interface PurchaseRecord {
   id: string;
@@ -412,6 +413,16 @@ export const PresaleSection: React.FC = () => {
       <div className="absolute bottom-0 left-0 w-32 h-[1px] bg-gradient-to-r from-g to-transparent shadow-[0_0_8px_#00ff88]" />
 
       <div className="text-center mb-16 select-none">
+        {/* Beautiful responsive mascot image without modifications/cropping */}
+        <div className="flex justify-center mb-8">
+          <img 
+            src={MASCOT_HERO} 
+            alt="Solaxy Mascot" 
+            className="w-full max-w-[280px] sm:max-w-[340px] h-auto rounded-2xl border border-g/20 shadow-[0_0_40px_rgba(0,255,136,0.25)] hover:border-g/40 transition-all duration-500 hover:scale-[1.02] select-none pointer-events-none"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+
         <div className="flex items-center justify-center gap-2 text-[10px] tracking-[5px] text-g/50 uppercase mb-4">
           <span className="w-6 h-[1px] bg-g shadow-[0_0_6px_#00ff88]" /> {
             presaleStatus === 'UPCOMING'
