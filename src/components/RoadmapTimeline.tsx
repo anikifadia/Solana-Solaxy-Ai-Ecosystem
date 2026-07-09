@@ -201,7 +201,14 @@ export default function RoadmapTimeline() {
   };
 
   return (
-    <section id="roadmap" className="relative z-[5] py-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto border-t border-g/10">
+    <motion.section 
+      id="roadmap" 
+      className="relative z-[5] py-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto border-t border-g/10"
+      initial={{ opacity: 0, y: 35 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    >
       {/* Visual cyber details */}
       <div className="absolute top-0 left-0 w-24 h-[1px] bg-gradient-to-r from-g to-transparent" />
       <div className="absolute bottom-0 right-0 w-24 h-[1px] bg-gradient-to-l from-g to-transparent" />
@@ -505,6 +512,6 @@ export default function RoadmapTimeline() {
           </AnimatePresence>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { PresaleSection } from './PresaleSection';
 import TokenOrb from './TokenOrb';
 import SecuritySentinel from './SecuritySentinel';
@@ -429,7 +430,14 @@ export default function PresalePage({ t }: PresalePageProps) {
       </div>
 
       {/* ══ QUANTUM TOKENOMICS DASHBOARD SECTION ══ */}
-      <section id="token" className="relative z-[10] py-16 sm:py-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto border-t border-g/10">
+      <motion.section 
+        id="token" 
+        className="relative z-[10] py-16 sm:py-24 px-4 sm:px-6 md:px-12 max-w-7xl mx-auto border-t border-g/10"
+        initial={{ opacity: 0, y: 35 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
         
         {/* Glow behind section title */}
         <div className="absolute top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-g/5 rounded-full blur-[150px] pointer-events-none" />
@@ -480,7 +488,12 @@ export default function PresalePage({ t }: PresalePageProps) {
 
         {/* TAB 1: DISTRIBUTION & VESTING (INTERACTIVE GRAPHICAL MATRIX) */}
         {activeTab === 'distribution' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+          >
             
             {/* Interactive SVG Pie/Donut Chart Visualizer & Info Banner */}
             <div className="lg:col-span-5 border border-white/10 bg-black/40 backdrop-blur-md p-6 flex flex-col justify-between relative overflow-hidden rounded-lg">
@@ -694,12 +707,16 @@ export default function PresalePage({ t }: PresalePageProps) {
 
             </div>
 
-          </div>
+          </motion.div>
         )}
 
         {/* TAB 2: TOKEN UTILITY MATRIX */}
         {activeTab === 'utility' && (
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <div className="text-center mb-10">
               <span className="text-[9px] font-mono tracking-[4px] text-g uppercase block mb-1">
                 {t('EKOSYSTEM PRAWDZIWEGO POPYTU', 'REAL DEMAND ECOSYSTEM')}
@@ -742,12 +759,17 @@ export default function PresalePage({ t }: PresalePageProps) {
                 );
               })}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* TAB 3: DEFLATIONARY ENGINE & REVENUE SHARING */}
         {activeTab === 'deflation' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+          >
             
             <div className="lg:col-span-7 flex flex-col gap-6">
               <div className="mb-2">
@@ -847,12 +869,17 @@ export default function PresalePage({ t }: PresalePageProps) {
 
             </div>
 
-          </div>
+          </motion.div>
         )}
 
         {/* TAB 4: DAO GOVERNANCE PORTAL */}
         {activeTab === 'governance' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <motion.div 
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch"
+          >
             
             {/* DAO Intro and categories */}
             <div className="lg:col-span-7 flex flex-col justify-between">
@@ -953,12 +980,16 @@ export default function PresalePage({ t }: PresalePageProps) {
 
             </div>
 
-          </div>
+          </motion.div>
         )}
 
         {/* TAB 5: LONG-TERM STRATEGY & ROADMAP */}
         {activeTab === 'roadmap' && (
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <div className="text-center mb-10">
               <span className="text-[9px] font-mono tracking-[4px] text-g uppercase block mb-1">
                 {t('HORYZONT WIELOLETNI', 'LONG TERM HORIZON')}
@@ -1003,7 +1034,7 @@ export default function PresalePage({ t }: PresalePageProps) {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Security Sentinel Trigger Hub */}
@@ -1011,7 +1042,7 @@ export default function PresalePage({ t }: PresalePageProps) {
           <SecuritySentinel />
         </div>
 
-      </section>
+      </motion.section>
     </div>
   );
 }
