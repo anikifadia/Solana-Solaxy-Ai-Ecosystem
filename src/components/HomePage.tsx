@@ -5,7 +5,6 @@ import AICoreReactor from './AICoreReactor';
 import MascotShowcase from './MascotShowcase';
 import RoadmapTimeline from './RoadmapTimeline';
 import MetricSparkline from './MetricSparkline';
-import HERO_POSTER_URL from '../assets/images/solaxy_mascot_hero_1783437956325.jpg';
 
 interface HomePageProps {
   t: (pl: string, en: string) => string;
@@ -45,54 +44,268 @@ export default function HomePage({
   return (
     <>
       {/* ══ HERO SECTION ══ */}
-      <section id="trade-hero" className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 sm:px-6 md:px-12 lg:px-24 pt-[110px] pb-12 z-[5] w-full">
-        <div className="max-w-5xl w-full mx-auto flex flex-col items-center gap-8">
+      <section id="trade-hero" className="min-h-screen flex items-center px-4 sm:px-6 md:px-12 lg:px-24 pt-[130px] sm:pt-[180px] pb-12 sm:pb-24 relative z-[5]">
+        <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Responsive Hero Poster Container */}
-          <div className="relative w-full rounded-xl overflow-hidden border border-g/30 bg-[#04080f]/95 shadow-[0_0_50px_rgba(0,255,136,0.18)] group transition-all duration-500 hover:border-g/50 hover:shadow-[0_0_60px_rgba(0,255,136,0.3)]">
-            {/* Ambient overlay light reflections */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
-            <div className="absolute -inset-10 bg-g/5 rounded-full filter blur-3xl opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none" />
-            
-            <img 
-              src={HERO_POSTER_URL} 
-              alt="Solaxy AI Token Ecosystem Launcher" 
-              className="w-full h-auto object-contain block mx-auto select-none pointer-events-none transition-transform duration-500 group-hover:scale-[1.01]"
-              referrerPolicy="no-referrer"
-            />
+          {/* Hero Content Left */}
+          <div className="lg:col-span-7">
+            <div className="flex items-center gap-3 text-[11px] sm:text-xs tracking-[5px] text-g/75 uppercase mb-6 font-bold">
+              <span className="scr-l h-[1px] w-[36px] bg-g shadow-[0_0_8px_#00ff88] inline-block" />
+              {t('ZAAWANSOWANY PROTOKÓŁ SOLANA DEX', 'ADVANCED SOLANA DEX PROTOCOL')}
+            </div>
+
+            <h1 className="font-display text-[38px] sm:text-6xl md:text-[80px] lg:text-[88px] leading-[1.1] sm:leading-[0.9] tracking-[3px] mb-8 font-extrabold">
+              <div className="text-g text-shadow-[0_0_12px_rgba(0,255,136,0.6)] glitch ficker-anim" data-t={t('PRZYSZŁOŚĆ', 'THE FUTURE')}>
+                {t('PRZYSZŁOŚĆ', 'THE FUTURE')}
+              </div>
+              <div className="text-r text-shadow-[0_0_12px_rgba(255,26,74,0.6)] glitch ficker-red-anim" data-t={t('HANDLU SVM', 'OF SVM TRADING')}>
+                {t('HANDLU SVM', 'OF SVM TRADING')}
+              </div>
+            </h1>
+
+            {/* ══ INTERACTIVE KEY ACTIONS TAGLINE ══ */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 font-mono text-[10px] sm:text-xs tracking-[3px] uppercase mb-8 font-extrabold select-none">
+              <button 
+                onClick={() => scrollToSection('generator')}
+                className="text-g hover:text-white hover:bg-g/10 hover:border-g/50 transition-all border border-g/20 bg-g/5 px-3 py-1.5 cursor-pointer rounded-sm"
+              >
+                CREATE
+              </button>
+              <span className="text-white/20 font-sans">•</span>
+              <button 
+                onClick={() => scrollToSection('presale')}
+                className="text-cyan hover:text-white hover:bg-cyan/10 hover:border-cyan/50 transition-all border border-cyan/20 bg-cyan/5 px-3 py-1.5 cursor-pointer rounded-sm"
+              >
+                LAUNCH
+              </button>
+              <span className="text-white/20 font-sans">•</span>
+              <button 
+                onClick={() => scrollToSection('forge')}
+                className="text-r hover:text-white hover:bg-r/10 hover:border-r/50 transition-all border border-r/20 bg-r/5 px-3 py-1.5 cursor-pointer rounded-sm"
+              >
+                DOMINATE
+              </button>
+            </div>
+
+            <p className="text-sm sm:text-base md:text-lg text-[#c8e6d2]/80 leading-relaxed max-w-[540px] mb-10 font-bold">
+              {t(
+                'Zaawansowany agregator płynności nowej generacji i ultra-szybki silnik transakcyjny na Solana SVM.',
+                'Next-generation liquidity aggregator and ultra-fast trading engine on Solana SVM.'
+              )} <br />
+              <strong className="text-g font-extrabold">$SLX</strong> {t('to nie tylko token — to ', 'is not just a token — it is a ')}<strong className="text-g font-extrabold">{t('protokół nowej ery', 'new era protocol')}</strong>.<br />
+              {t('Zabezpieczony smart contract · zero custody · inteligentny routing.', 'Secure smart contract · zero custody · intelligent routing.')}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-center mb-16 w-full">
+              <button onClick={() => scrollToSection('presale')} className="btn-neon interactive-cursor w-full sm:w-auto text-center font-bold bg-transparent border-none">
+                <span className="c tl" /><span className="c tr" />
+                <span className="c bl" /><span className="c br" />
+                {t('⚡ START PRESALE', '⚡ START PRESALE')}
+              </button>
+              <button onClick={() => scrollToSection('generator')} className="btn-neon red sm interactive-cursor w-full sm:w-auto text-center font-bold bg-transparent border-none">
+                <span className="c tl" /><span className="c tr" />
+                <span className="c bl" /><span className="c br" />
+                {t('⚡ TWÓRZ TOKEN', '⚡ CREATE TOKEN')}
+              </button>
+              <button onClick={() => scrollToSection('pools')} className="btn-neon border-white/20 hover:border-white/40 text-white/80 hover:text-white sm interactive-cursor w-full sm:w-auto text-center font-bold bg-transparent">
+                <span className="c tl" /><span className="c tr" />
+                <span className="c bl" /><span className="c br" />
+                {t('WATCH DEMO ➔', 'WATCH DEMO ➔')}
+              </button>
+            </div>
+
+            {/* ══ COCKPIT CONTROL PANEL / MISSION DIRECTORY ══ */}
+            <div className="mb-12 border border-g/15 bg-[#04080f]/75 p-5 relative rounded">
+              <span className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-g" />
+              <span className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-g" />
+              <span className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-g" />
+              <span className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-g" />
+              
+              <div className="flex items-center justify-between border-b border-g/10 pb-3 mb-4 font-mono select-none">
+                <span className="text-[10px] tracking-[4px] text-g font-bold uppercase flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-g animate-pulse" />
+                  {t('SZYBKA NAWIGACJA SATELLITE', 'SATELLITE QUICK DIRECTORY')}
+                </span>
+                <span className="text-[8px] text-white/30 uppercase">SYS_INDEX // SLX-DIR-01</span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { id: 'pools', name: t('HANDEL DEX', 'DEX SWAP'), chibi: 'chibi-wave' },
+                  { id: 'network', name: 'SOLANA SVM', chibi: 'chibi-shades' },
+                  { id: 'token', name: t('TOKEN $SLX', '$SLX HUB'), chibi: 'chibi-swirl' },
+                  { id: 'generator', name: t('KREATOR AI', 'AI ENGINE'), chibi: 'chibi-tablet' },
+                  { id: 'forge', name: t('KUŹNIA & YIELD', 'FORGE YIELD'), chibi: 'chibi-laptop' },
+                  { id: 'features', name: t('MOŻLIWOŚCI', 'CAPABILITIES'), chibi: 'chibi-idea' },
+                  { id: 'roadmap', name: t('HARMONOGRAM', 'ROADMAP'), chibi: 'chibi-heart' },
+                  { id: 'sentinel-hub', name: t('ZABEZPIECZENIA', 'SECURITY CORE'), chibi: 'chibi-confused' }
+                ].map((sec) => (
+                  <button
+                    key={sec.id}
+                    onClick={() => scrollToSection(sec.id)}
+                    className="flex items-center gap-2.5 p-2 border border-white/5 bg-black/40 hover:bg-g/5 hover:border-g/30 hover:shadow-[0_0_12px_rgba(0,255,136,0.1)] transition-all duration-300 text-left cursor-pointer group rounded w-full"
+                  >
+                    <div className="w-10 h-10 bg-black/60 border border-white/10 rounded flex-shrink-0 p-0.5 flex items-center justify-center overflow-hidden group-hover:border-g/30">
+                      <SlicedAsset asset={sec.chibi as any} className="w-full h-full group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-display font-extrabold text-white group-hover:text-g tracking-[0.5px] uppercase transition-colors">
+                        {sec.name}
+                      </div>
+                      <div className="text-[7.5px] font-mono text-white/30 group-hover:text-white/50 tracking-[1px] uppercase">
+                        {t('PRZEJDŹ', 'GOTO')} ➔
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Key Metrics Dashboard */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 items-start">
+              {/* 1. TVL Card */}
+              <div 
+                onClick={() => setExpandedMetric(expandedMetric === 'tvl' ? null : 'tvl')}
+                onMouseEnter={() => handleMetricMouseEnter('tvl')}
+                onMouseLeave={handleMetricMouseLeave}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedMetric(expandedMetric === 'tvl' ? null : 'tvl'); } }}
+                role="button"
+                tabIndex={0}
+                className={`metric-card-glitch py-3 px-4 interactive-cursor rounded-r select-none outline-none focus-visible:ring-1 focus-visible:ring-g/50 transition-all duration-300 ${
+                  expandedMetric === 'tvl' ? 'expanded' : ''
+                }`}
+              >
+                <div className="metric-glow" />
+                <div className="metric-value font-display text-3xl md:text-4xl text-g text-shadow-[0_0_15px_rgba(0,255,136,0.5)]">
+                  ${tvl}B
+                </div>
+                <div className="text-[9px] tracking-[2px] uppercase text-white/40 mt-1 font-mono select-none">
+                  {t('Zablokowane TVL', 'TVL Locked')}
+                </div>
+                <div className="text-[7px] tracking-[1px] text-g/40 mt-2 uppercase flex items-center gap-1 select-none font-mono">
+                  <span>{expandedMetric === 'tvl' ? t('▲ ZWIŃ', '▲ COLLAPSE') : t('▼ POKAŻ TREND', '▼ VIEW TREND')}</span>
+                </div>
+                {expandedMetric === 'tvl' && (
+                  <MetricSparkline metricId="tvl" currentValue={tvl} />
+                )}
+              </div>
+
+              {/* 2. Trades Card */}
+              <div 
+                onClick={() => setExpandedMetric(expandedMetric === 'trades' ? null : 'trades')}
+                onMouseEnter={() => handleMetricMouseEnter('trades')}
+                onMouseLeave={handleMetricMouseLeave}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedMetric(expandedMetric === 'trades' ? null : 'trades'); } }}
+                role="button"
+                tabIndex={0}
+                className={`metric-card-glitch py-3 px-4 interactive-cursor rounded-r select-none outline-none focus-visible:ring-1 focus-visible:ring-g/50 transition-all duration-300 ${
+                  expandedMetric === 'trades' ? 'expanded' : ''
+                }`}
+              >
+                <div className="metric-glow" />
+                <div className="metric-value font-display text-3xl md:text-4xl text-g text-shadow-[0_0_15px_rgba(0,255,136,0.5)]">
+                  {trades}M
+                </div>
+                <div className="text-[9px] tracking-[2px] uppercase text-white/40 mt-1 font-mono select-none">
+                  {t('Transakcje / 24h', 'Trades / 24h')}
+                </div>
+                <div className="text-[7px] tracking-[1px] text-g/40 mt-2 uppercase flex items-center gap-1 select-none font-mono">
+                  <span>{expandedMetric === 'trades' ? t('▲ ZWIŃ', '▲ COLLAPSE') : t('▼ POKAŻ TREND', '▼ VIEW TREND')}</span>
+                </div>
+                {expandedMetric === 'trades' && (
+                  <MetricSparkline metricId="trades" currentValue={trades} />
+                )}
+              </div>
+
+              {/* 3. TPS Card */}
+              <div 
+                onClick={() => setExpandedMetric(expandedMetric === 'tps' ? null : 'tps')}
+                onMouseEnter={() => handleMetricMouseEnter('tps')}
+                onMouseLeave={handleMetricMouseLeave}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedMetric(expandedMetric === 'tps' ? null : 'tps'); } }}
+                role="button"
+                tabIndex={0}
+                className={`metric-card-glitch py-3 px-4 interactive-cursor rounded-r select-none outline-none focus-visible:ring-1 focus-visible:ring-g/50 transition-all duration-300 ${
+                  expandedMetric === 'tps' ? 'expanded' : ''
+                }`}
+              >
+                <div className="metric-glow" />
+                <div className="metric-value font-display text-3xl md:text-4xl text-g text-shadow-[0_0_15px_rgba(0,255,136,0.5)]">
+                  {(tps / 1000).toFixed(1)}K
+                </div>
+                <div className="text-[9px] tracking-[2px] uppercase text-white/40 mt-1 font-mono select-none">
+                  {t('Solana TPS', 'Solana TPS')}
+                </div>
+                <div className="text-[7px] tracking-[1px] text-g/40 mt-2 uppercase flex items-center gap-1 select-none font-mono">
+                  <span>{expandedMetric === 'tps' ? t('▲ ZWIŃ', '▲ COLLAPSE') : t('▼ POKAŻ TREND', '▼ VIEW TREND')}</span>
+                </div>
+                {expandedMetric === 'tps' && (
+                  <MetricSparkline metricId="tps" currentValue={tps} />
+                )}
+              </div>
+
+              {/* 4. Volume Card */}
+              <div 
+                onClick={() => setExpandedMetric(expandedMetric === 'volume' ? null : 'volume')}
+                onMouseEnter={() => handleMetricMouseEnter('volume')}
+                onMouseLeave={handleMetricMouseLeave}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedMetric(expandedMetric === 'volume' ? null : 'volume'); } }}
+                role="button"
+                tabIndex={0}
+                className={`metric-card-glitch py-3 px-4 interactive-cursor rounded-r select-none outline-none focus-visible:ring-1 focus-visible:ring-g/50 transition-all duration-300 ${
+                  expandedMetric === 'volume' ? 'expanded' : ''
+                }`}
+              >
+                <div className="metric-glow" />
+                <div className="metric-value font-display text-3xl md:text-4xl text-g text-shadow-[0_0_15px_rgba(0,255,136,0.5)]">
+                  ${volume}M
+                </div>
+                <div className="text-[9px] tracking-[2px] uppercase text-white/40 mt-1 font-mono select-none">
+                  {t('Wolumen 24h', 'Volume 24h')}
+                </div>
+                <div className="text-[7px] tracking-[1px] text-g/40 mt-2 uppercase flex items-center gap-1 select-none font-mono">
+                  <span>{expandedMetric === 'volume' ? t('▲ ZWIŃ', '▲ COLLAPSE') : t('▼ POKAŻ TREND', '▼ VIEW TREND')}</span>
+                </div>
+                {expandedMetric === 'volume' && (
+                  <MetricSparkline metricId="volume" currentValue={volume} />
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Interactive Button Shortcuts for quick navigation */}
-          <div className="flex flex-wrap gap-4 sm:gap-6 justify-center w-full z-10 select-none">
-            <button 
-              onClick={() => scrollToSection('presale')} 
-              className="btn-neon interactive-cursor text-center font-bold bg-transparent border-none py-3 px-6 text-xs sm:text-sm"
+          {/* Hero Graphic Right (AI Core Reactor & Mascot) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative group select-none gap-6">
+            {/* Ambient glows and lines */}
+            <div className="absolute -inset-4 bg-g/5 rounded-full filter blur-3xl opacity-50 group-hover:opacity-80 transition-opacity duration-500 animate-[pulse_6s_ease-in-out_infinite] pointer-events-none" />
+            
+            {/* 🤖 Solaxy Mascot Character ("Typ") at the very top of the Hero zone */}
+            <motion.div 
+              animate={{ y: [0, -12, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              onClick={() => {
+                scrollToSection('generator');
+                setTimeout(() => {
+                  window.dispatchEvent(new CustomEvent('trigger-mascot-prompt'));
+                }, 400);
+              }}
+              className="relative w-[180px] sm:w-[210px] flex flex-col items-center group-hover:scale-105 transition-transform duration-500 cursor-pointer active:scale-95"
+              title={t('Kliknij mnie, aby stworzyć token o pieskach!', 'Click me to generate a token about dogs!')}
             >
-              <span className="c tl" /><span className="c tr" />
-              <span className="c bl" /><span className="c br" />
-              {t('⚡ ROZPOCZNIJ PRZEDSPRZEDAŻ', '⚡ START PRESALE')}
-            </button>
-            <button 
-              onClick={() => scrollToSection('generator')} 
-              className="btn-neon red interactive-cursor text-center font-bold bg-transparent border-none py-3 px-6 text-xs sm:text-sm"
-            >
-              <span className="c tl" /><span className="c tr" />
-              <span className="c bl" /><span className="c br" />
-              {t('⚡ KREATOR TOKENÓW AI', '⚡ AI TOKEN FACTORY')}
-            </button>
-            <button 
-              onClick={() => scrollToSection('pools')} 
-              className="btn-neon border-white/20 hover:border-white/40 text-white/80 hover:text-white interactive-cursor py-3 px-6 text-xs sm:text-sm bg-transparent"
-            >
-              <span className="c tl" /><span className="c tr" />
-              <span className="c bl" /><span className="c br" />
-              {t('WIZUALIZATOR SWAP AMM ➔', 'SWAP AMM VISUALIZER ➔')}
-            </button>
+              {/* Retro HUD speech bubble */}
+              <div className="absolute -top-12 bg-g/10 border border-g/30 px-3 py-1 text-[9px] text-g font-bold tracking-[1.5px] select-none font-mono text-center z-10 whitespace-nowrap shadow-[0_0_15px_rgba(0,255,136,0.25)] rounded-sm">
+                {t('KLIKNIJ MNIE: PROMPT AI!', 'CLICK ME: AI PROMPT!')}
+                <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-[#04080f] border-r border-b border-g/30 rotate-45" />
+              </div>
+              <SlicedAsset asset="main-pose" className="w-full h-auto drop-shadow-[0_0_40px_rgba(0,255,136,0.35)]" />
+            </motion.div>
+
+            <AICoreReactor />
           </div>
+
         </div>
 
         {/* Scroll helper */}
-        <div className="absolute bottom-[20px] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none">
+        <div className="absolute bottom-[36px] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none">
           <div className="scr-l" />
           <div className="text-[8px] tracking-[4px] text-g/40">{t('PRZEWIŃ', 'SCROLL')}</div>
         </div>
