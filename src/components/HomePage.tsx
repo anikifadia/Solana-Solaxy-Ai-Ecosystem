@@ -6,6 +6,10 @@ import MascotShowcase from './MascotShowcase';
 import RoadmapTimeline from './RoadmapTimeline';
 import Wormhole from './Wormhole';
 
+import HERO_IMAGE from '../assets/images/solaxy_mascot_hero_1783437956325.jpg';
+import BEYOND_IMAGE from '../assets/images/solaxy_beyond_chain_1783602087724.jpg';
+import POSES_IMAGE from '../assets/images/solaxy_mascot_poses_1783437972677.jpg';
+
 interface HomePageProps {
   t: (pl: string, en: string) => string;
   scrollToSection: (id: string) => void;
@@ -50,7 +54,7 @@ export default function HomePage({
           {/* Hero Content Left */}
           <div className="lg:col-span-7">
             <img 
-              src="/src/assets/images/solaxy_mascot_hero_1783437956325.jpg" 
+              src={HERO_IMAGE} 
               alt="Solaxy Hero" 
               className="w-full h-auto rounded-lg border border-g/15 shadow-[0_0_35px_rgba(0,255,136,0.15)] mb-8"
             />
@@ -175,7 +179,7 @@ export default function HomePage({
             {/* Promotional Banner */}
             <div className="mb-12 overflow-hidden rounded-lg border border-g/15 shadow-[0_0_35px_rgba(0,255,136,0.15)] bg-black/45">
               <img 
-                src="/src/assets/images/solaxy_beyond_chain_1783602087724.jpg" 
+                src={BEYOND_IMAGE} 
                 alt="Solaxy Beyond The Chain" 
                 className="w-full h-auto object-cover"
                 referrerPolicy="no-referrer"
@@ -260,7 +264,7 @@ export default function HomePage({
             {/* Mascot Poses Banner */}
             <div className="mb-14 overflow-hidden rounded-lg border border-g/15 shadow-[0_0_35px_rgba(0,255,136,0.15)] bg-black/45">
               <img 
-                src="/src/assets/images/solaxy_mascot_poses_1783437972677.jpg" 
+                src={POSES_IMAGE} 
                 alt="Solaxy Mascot Poses" 
                 className="w-full h-auto object-cover"
                 referrerPolicy="no-referrer"
