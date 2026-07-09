@@ -19,36 +19,61 @@ interface PurchaseRecord {
 export const PresaleSection: React.FC = () => {
   const { t } = useLanguage();
 
-  // --- Countdown State ---
+  // --- Countdown State & Real Presale Target Configuration ---
   const [timeLeft, setTimeLeft] = useState({
-    days: 3,
-    hours: 14,
-    minutes: 28,
-    seconds: 42,
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
   });
+  const [presaleStatus, setPresaleStatus] = useState<'UPCOMING' | 'LIVE' | 'ENDED'>('UPCOMING');
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        } else if (prev.days > 0) {
-          return { days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
-        } else {
-          return { days: 3, hours: 14, minutes: 28, seconds: 59 };
-        }
-      });
-    }, 1000);
+    const calculateTime = () => {
+      const now = new Date();
+      // Real start date: August 1st, 2026 00:00:00 (Local Time)
+      const startDate = new Date('2026-08-01T00:00:00');
+      // Real end date: 30 days after August 1st, i.e., August 31st, 2026 00:00:00 (Local Time)
+      const endDate = new Date('2026-08-31T00:00:00');
 
+      let targetDate = startDate;
+      let status: 'UPCOMING' | 'LIVE' | 'ENDED' = 'UPCOMING';
+
+      if (now < startDate) {
+        targetDate = startDate;
+        status = 'UPCOMING';
+      } else if (now >= startDate && now < endDate) {
+        targetDate = endDate;
+        status = 'LIVE';
+      } else {
+        status = 'ENDED';
+      }
+
+      setPresaleStatus(status);
+
+      if (status === 'ENDED') {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const diffMs = targetDate.getTime() - now.getTime();
+      const diffSecs = Math.max(0, Math.floor(diffMs / 1000));
+
+      const days = Math.floor(diffSecs / (3600 * 24));
+      const hours = Math.floor((diffSecs % (3600 * 24)) / 3600);
+      const minutes = Math.floor((diffSecs % 3600) / 60);
+      const seconds = diffSecs % 60;
+
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    calculateTime();
+    const timer = setInterval(calculateTime, 1000);
     return () => clearInterval(timer);
   }, []);
 
   // --- Presale Live Stats ---
-  const [solRaised, setSolRaised] = useState(14960.50);
+  const [solRaised, setSolRaised] = useState(0.00);
   const [targetSol, setTargetSol] = useState(20000);
   const [receiverAddress, setReceiverAddress] = useState('7KBXwNo6Jv2kGKoWui7TaKQL8TKHG780BPQNK39UXIQN');
   const [purchases, setPurchases] = useState<PurchaseRecord[]>([]);
@@ -388,7 +413,13 @@ export const PresaleSection: React.FC = () => {
 
       <div className="text-center mb-16 select-none">
         <div className="flex items-center justify-center gap-2 text-[10px] tracking-[5px] text-g/50 uppercase mb-4">
-          <span className="w-6 h-[1px] bg-g shadow-[0_0_6px_#00ff88]" /> {t('URUCHOMIONO ETAP DRUGI PRZEDSPRZEDAŻY', 'PRESALE STAGE TWO IS ACTIVE')}
+          <span className="w-6 h-[1px] bg-g shadow-[0_0_6px_#00ff88]" /> {
+            presaleStatus === 'UPCOMING'
+              ? t('PRZEDSPRZEDAŻ STARTUJE 1 SIERPNIA', 'PRESALE STARTS AUGUST 1ST')
+              : presaleStatus === 'LIVE'
+                ? t('URUCHOMIONO ETAP DRUGI PRZEDSPRZEDAŻY', 'PRESALE STAGE TWO IS ACTIVE')
+                : t('PRZEDSPRZEDAŻ ZAKOŃCZONA', 'PRESALE HAS ENDED')
+          }
         </div>
         <h2 className="font-display text-3xl md:text-5xl tracking-[2px] text-white uppercase">
           {t('ZABEZPIECZONY ', 'SECURE ')}
@@ -416,9 +447,23 @@ export const PresaleSection: React.FC = () => {
             <div className="flex justify-between items-center border-b border-g/10 pb-4 mb-8">
               <span className="text-[10px] tracking-[3px] text-g font-bold uppercase flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-g rounded-full animate-pulse" />
-                {t('CYFROWY ZEGAR PRZEDSPRZEDAŻY', 'PRESALE SYSTEM CLOCK')}
+                {
+                  presaleStatus === 'UPCOMING'
+                    ? t('ODLICZANIE DO ROZPOCZĘCIA', 'COUNTDOWN TO LAUNCH')
+                    : presaleStatus === 'LIVE'
+                      ? t('CYFROWY ZEGAR PRZEDSPRZEDAŻY', 'PRESALE SYSTEM CLOCK')
+                      : t('PRZEDSPRZEDAŻ ZAKOŃCZONA', 'PRESALE COMPLETED')
+                }
               </span>
-              <span className="text-[8px] text-white/30 font-mono">SYS_CLOCK // PRE_STAGE_02</span>
+              <span className="text-[8px] text-white/30 font-mono">
+                {
+                  presaleStatus === 'UPCOMING'
+                    ? 'SYS_CLOCK // PRE_UPCOMING'
+                    : presaleStatus === 'LIVE'
+                      ? 'SYS_CLOCK // PRE_STAGE_02'
+                      : 'SYS_CLOCK // PRE_ENDED'
+                }
+              </span>
             </div>
 
             {/* HIGH-END DIGITAL COUNTDOWN TIMER WITH GLOW */}

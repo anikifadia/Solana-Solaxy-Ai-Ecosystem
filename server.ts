@@ -241,24 +241,29 @@ declare_id!("KoparkaMiningToken111111111111111111111");`,
   function loadPresale() {
     try {
       if (fs.existsSync(CONTRIBUTIONS_FILE)) {
-        return JSON.parse(fs.readFileSync(CONTRIBUTIONS_FILE, "utf8"));
+        const parsed = JSON.parse(fs.readFileSync(CONTRIBUTIONS_FILE, "utf8"));
+        // If it's the old template data with legacy dummy stats, reset it!
+        if (parsed.solRaisedBase === 14960.50) {
+          console.log("Resetting legacy dummy presale contributions data.");
+          return {
+            solRaisedBase: 0.00,
+            targetSol: 20000,
+            receiverAddress: process.env.SOL_PRESALE_RECEIVER || DEFAULT_RECEIVER,
+            contributions: []
+          };
+        }
+        return parsed;
       }
     } catch (e) {
       console.error("Error reading contributions file:", e);
     }
     
-    // Default initial data
+    // Default initial data starting from 0
     return {
-      solRaisedBase: 14960.50,
+      solRaisedBase: 0.00,
       targetSol: 20000,
       receiverAddress: process.env.SOL_PRESALE_RECEIVER || DEFAULT_RECEIVER,
-      contributions: [
-        { id: "1", address: "4a8v...K9p1", amountSol: 15.5, amountSlx: 103333, timestamp: Date.now() - 120000 },
-        { id: "2", address: "D3xj...pL2o", amountSol: 8.0, amountSlx: 53333, timestamp: Date.now() - 300000 },
-        { id: "3", address: "Solf...8zKq", amountSol: 25.0, amountSlx: 166666, timestamp: Date.now() - 720000 },
-        { id: "4", address: "9a2f...1x8p", amountSol: 4.5, amountSlx: 30000, timestamp: Date.now() - 1080000 },
-        { id: "5", address: "Phan...w4eR", amountSol: 42.0, amountSlx: 280000, timestamp: Date.now() - 1440000 }
-      ]
+      contributions: []
     };
   }
 
