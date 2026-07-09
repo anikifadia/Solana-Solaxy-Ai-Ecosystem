@@ -38,6 +38,8 @@ import SlicedAsset from './components/SlicedAsset';
 import RoadmapTimeline from './components/RoadmapTimeline';
 import { PresaleSection } from './components/PresaleSection';
 import { useLanguage } from './LanguageContext';
+import { useWallet } from './WalletContext';
+import ConnectWalletModal from './components/ConnectWalletModal';
 
 // Live Ticker items structure
 interface TickerItem {
@@ -62,6 +64,8 @@ const INITIAL_TICKER_DATA: TickerItem[] = [
 
 export default function App() {
   const { t, language, setLanguage } = useLanguage();
+  const { walletAddress, isConnected } = useWallet();
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [tickerData, setTickerData] = useState<TickerItem[]>(INITIAL_TICKER_DATA);
   const [solPrice, setSolPrice] = useState<number>(182.74);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -626,10 +630,24 @@ export default function App() {
             SOL: <span className="text-g font-bold">{formatPrice(solPrice)}</span>
           </span>
           <button 
-            onClick={() => scrollToSection('cta')} 
-            className="nav-btn text-[9px] md:text-[10px] tracking-[3px] uppercase px-4 py-2 border border-g text-g bg-transparent relative overflow-hidden transition-all duration-300 hover:bg-g/10 hover:shadow-[0_0_20px_rgba(0,255,136,0.4)] cursor-pointer font-mono"
+            onClick={() => setIsWalletModalOpen(true)} 
+            className={`text-[9px] md:text-[10px] tracking-[2px] uppercase px-4 py-2 border relative overflow-hidden transition-all duration-300 cursor-pointer font-mono flex items-center gap-2 rounded-sm ${
+              isConnected 
+                ? 'border-g bg-g/5 text-g hover:bg-g/15 hover:shadow-[0_0_15px_rgba(0,255,136,0.3)]' 
+                : 'border-cyan bg-cyan/5 text-cyan hover:bg-cyan/15 hover:shadow-[0_0_15px_rgba(0,238,255,0.3)]'
+            }`}
           >
-            {t('URUCHOM APLIKACJĘ', 'LAUNCH APP')}
+            {isConnected ? (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-g animate-pulse shrink-0" />
+                <span>{walletAddress?.slice(0, 4)}...{walletAddress?.slice(-4)}</span>
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                <span>{t('POŁĄCZ PORTFEL', 'CONNECT WALLET')}</span>
+              </>
+            )}
           </button>
 
           {/* Hamburger Menu Toggle Button */}
@@ -720,10 +738,19 @@ export default function App() {
               <li>
                 <button 
                   onClick={() => { scrollToSection('roadmap'); setIsMobileMenuOpen(false); }}
-                  className="w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 text-g hover:text-white hover:bg-g/10 bg-transparent border-none cursor-pointer text-left font-mono"
+                  className="w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 text-g hover:text-white hover:bg-g/10 border-b border-white/5 bg-transparent border-none cursor-pointer text-left font-mono"
                 >
                   <span>ROADMAP</span>
                   <span className="text-[12px] text-g">➔</span>
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => { setIsWalletModalOpen(true); setIsMobileMenuOpen(false); }}
+                  className="w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 text-cyan hover:text-white hover:bg-cyan/10 bg-transparent border-none cursor-pointer text-left font-mono"
+                >
+                  <span>{isConnected ? `${walletAddress?.slice(0, 6)}...${walletAddress?.slice(-6)}` : t('POŁĄCZ PORTFEL', 'CONNECT WALLET')}</span>
+                  <span className="text-[12px] text-cyan">➔</span>
                 </button>
               </li>
             </ul>
@@ -961,10 +988,25 @@ export default function App() {
             </div>
           </div>
 
-          {/* Hero Graphic Right (AI Core Reactor) */}
-          <div className="lg:col-span-5 flex justify-center items-center relative group select-none">
+          {/* Hero Graphic Right (AI Core Reactor & Mascot) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative group select-none gap-6">
             {/* Ambient glows and lines */}
-            <div className="absolute -inset-4 bg-g/5 rounded-full filter blur-3xl opacity-50 group-hover:opacity-80 transition-opacity duration-500 animate-[pulse_6s_ease-in-out_infinite]" />
+            <div className="absolute -inset-4 bg-g/5 rounded-full filter blur-3xl opacity-50 group-hover:opacity-80 transition-opacity duration-500 animate-[pulse_6s_ease-in-out_infinite] pointer-events-none" />
+            
+            {/* 🤖 Solaxy Mascot Character ("Typ") at the very top of the Hero zone */}
+            <motion.div 
+              animate={{ y: [0, -12, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              className="relative w-[180px] sm:w-[210px] flex flex-col items-center group-hover:scale-105 transition-transform duration-500"
+            >
+              {/* Retro HUD speech bubble */}
+              <div className="absolute -top-12 bg-g/10 border border-g/30 px-3 py-1 text-[9px] text-g font-bold tracking-[1.5px] select-none font-mono text-center z-10 whitespace-nowrap shadow-[0_0_15px_rgba(0,255,136,0.25)] rounded-sm">
+                {t('STWÓRZ SWÓJ TOKEN AI!', 'CREATE YOUR AI TOKEN!')}
+                <div className="absolute bottom-[-5px] left-1/2 -translate-x-1/2 w-2 h-2 bg-[#04080f] border-r border-b border-g/30 rotate-45" />
+              </div>
+              <SlicedAsset asset="main-pose" className="w-full h-auto drop-shadow-[0_0_40px_rgba(0,255,136,0.35)]" />
+            </motion.div>
+
             <AICoreReactor />
           </div>
 
@@ -1654,11 +1696,11 @@ export default function App() {
           <div className="flex flex-wrap gap-5 justify-center mb-10">
             <button 
               className="btn-neon text-xl sm:text-2xl px-12 py-5 interactive-cursor" 
-              onClick={() => alert(t('W AI Studio Preview symulowana jest bezpieczna integracja autoryzacji transakcji Solana. Połączenie portfela przebiegło pomyślnie!', 'Solana transaction authorization secure integration simulated in AI Studio Preview. Wallet connected successfully!'))}
+              onClick={() => setIsWalletModalOpen(true)}
             >
               <span className="c tl" /><span className="c tr" />
               <span className="c bl" /><span className="c br" />
-              ⚡ {t('POŁĄCZ PORTFEL', 'CONNECT WALLET')}
+              {isConnected ? `⚡ ${walletAddress?.slice(0, 6)}...${walletAddress?.slice(-6)}` : `⚡ ${t('POŁĄCZ PORTFEL', 'CONNECT WALLET')}`}
             </button>
             <a href="#" className="btn-neon red px-8 py-4 text-sm sm:text-base interactive-cursor">
               <span className="c tl" /><span className="c tr" />
@@ -1695,6 +1737,8 @@ export default function App() {
           ))}
         </div>
       </footer>
+
+      <ConnectWalletModal isOpen={isWalletModalOpen} onClose={() => setIsWalletModalOpen(false)} />
 
     </div>
   );

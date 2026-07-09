@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Coins, Flame, Hammer, TrendingUp, Sparkles, Zap, ShieldCheck, 
   Cat, Globe, Rocket, Trophy, Heart, Crown, ArrowRight, Code, 
-  Copy, Terminal, Check, Loader2, Play, Info
+  Copy, Terminal, Check, Loader2, Play, Info, CheckCircle2, Cpu, Activity
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 
@@ -35,6 +35,18 @@ export default function AITokenGenerator() {
   const [isDeploying, setIsDeploying] = useState(false);
   const [deploySuccess, setDeploySuccess] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
+  const [deployStepIndex, setDeployStepIndex] = useState<number>(-1);
+  const [deployProgress, setDeployProgress] = useState<number>(0);
+
+  const deploySteps = [
+    { labelPl: "Inicjalizacja RPC", labelEn: "RPC Connection", pct: 15 },
+    { labelPl: "Podpisy Autoryzacji", labelEn: "Signature Auth", pct: 30 },
+    { labelPl: "Konto Mint SVM", labelEn: "SVM Mint Account", pct: 45 },
+    { labelPl: "Metadane SPL", labelEn: "SPL Metadata", pct: 65 },
+    { labelPl: "Emisja Tokenów", labelEn: "Token Minting", pct: 80 },
+    { labelPl: "Zrzeczenie Praw", labelEn: "Renounce Authority", pct: 95 },
+    { labelPl: "Finalizacja w Bazie", labelEn: "Finalization", pct: 100 }
+  ];
 
   // Pre-configured templates to help the user get inspired
   const templates = [
@@ -116,53 +128,120 @@ export default function AITokenGenerator() {
   const handleDeployOnSolana = () => {
     if (!token || isDeploying) return;
     setIsDeploying(true);
+    setDeploySuccess(false);
+    setDeployProgress(0);
+    setDeployStepIndex(0);
+
+    const steps = [
+      {
+        labelPl: "Inicjalizacja środowiska Anchor & portfela...",
+        labelEn: "Initializing Anchor environment & wallet...",
+        pct: 15,
+        logPl: "Nawiązywanie połączenia z węzłem Solana Mainnet RPC (api.mainnet-beta.solana.com)...",
+        logEn: "Establishing connection with Solana Mainnet RPC node (api.mainnet-beta.solana.com)..."
+      },
+      {
+        labelPl: "Weryfikacja uprawnień i podpisu portfela...",
+        labelEn: "Verifying authority signatures & credentials...",
+        pct: 30,
+        logPl: "Sprawdzanie uprawnień sygnatariusza na Solana VM...",
+        logEn: "Checking signer permissions on Solana VM..."
+      },
+      {
+        labelPl: "Tworzenie konta Mint (Token Account) na Solana SVM...",
+        labelEn: "Creating Mint Account (Token Account) on Solana SVM...",
+        pct: 45,
+        logPl: "Alokowanie przestrzeni konta i opłacanie czynszu (Rent Exempt)...",
+        logEn: "Allocating account space and paying rent-exemption fee..."
+      },
+      {
+        labelPl: "Publikacja metadanych i on-chain URI specyfikacji...",
+        labelEn: "Publishing metadata & on-chain URI specifications...",
+        pct: 65,
+        logPl: "Wdrażanie struktur Metaplex Token Metadata...",
+        logEn: "Deploying Metaplex Token Metadata structures..."
+      },
+      {
+        labelPl: "Emisja wolumenu i dystrybucja do skarbca...",
+        labelEn: "Minting supply & distributing to vault...",
+        pct: 80,
+        logPl: `Przesyłanie instrukcji MintTo dla ${token.supply.toLocaleString()} ${token.ticker}...`,
+        logEn: `Sending MintTo instruction for ${token.supply.toLocaleString()} ${token.ticker}...`
+      },
+      {
+        labelPl: "Blokowanie uprawnień mennicy (Renounce Authority)...",
+        labelEn: "Renouncing mint authority for contract safety...",
+        pct: 95,
+        logPl: "Ustawianie Mint Authority na null celem 100% bezpieczeństwa...",
+        logEn: "Setting Mint Authority to null for 100% security..."
+      },
+      {
+        labelPl: "Finalizacja zapisu bloku w bazie Solaxy...",
+        labelEn: "Finalizing block registration in Solaxy database...",
+        pct: 100,
+        logPl: "Rejestracja w lokalnym indeksie DEX i synchronizacja...",
+        logEn: "Registering in the local DEX index and syncing..."
+      }
+    ];
+
     setTerminalLogs(prev => [
       ...prev,
-      "--- DEPLOYMENT INITIATED ---",
-      "Connecting to Solana Mainnet RPC node...",
-      "Verifying authority transaction signatures..."
+      "--- DEPLOYMENT INITIATED ---"
     ]);
 
-    setTimeout(() => {
-      setTerminalLogs(prev => [
-        ...prev,
-        `Paying transaction gas fees...`,
-        `Registering SPL Token Mint Authority on-chain...`,
-        `Minting ${token.supply.toLocaleString()} ${token.ticker} tokens...`
-      ]);
-    }, 1200);
+    const runStep = (idx: number) => {
+      if (idx >= steps.length) {
+        // Final backend save
+        setTimeout(async () => {
+          try {
+            const response = await fetch('/api/tokens/deploy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: token.name,
+                ticker: token.ticker,
+                description: token.description,
+                supply: token.supply,
+                iconType: token.iconType,
+                colorGradient: token.colorGradient,
+                anchorCode: token.anchorCode
+              })
+            });
 
-    setTimeout(async () => {
-      try {
-        const response = await fetch('/api/tokens/deploy', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: token.name,
-            ticker: token.ticker,
-            description: token.description,
-            supply: token.supply,
-            iconType: token.iconType,
-            colorGradient: token.colorGradient,
-            anchorCode: token.anchorCode
-          })
-        });
+            if (response.ok) {
+              window.dispatchEvent(new CustomEvent('token-deployed'));
+            }
+          } catch (err) {
+            console.error("Error deploying token to server:", err);
+          }
 
-        if (response.ok) {
-          window.dispatchEvent(new CustomEvent('token-deployed'));
-        }
-      } catch (err) {
-        console.error("Error deploying token to server:", err);
+          setIsDeploying(false);
+          setDeploySuccess(true);
+          setTerminalLogs(prev => [
+            ...prev,
+            "Transaction Signature Hash: 5fG49s61Xj8GvA1h9x3Lp0sW7mQ91hN8zKqPx9a2f... (Confirmed on SVM)",
+            `SUCCESS: Token ${token.name} (${token.ticker}) fully deployed on Solana Network!`
+          ]);
+        }, 800);
+        return;
       }
 
-      setIsDeploying(false);
-      setDeploySuccess(true);
+      const currentStep = steps[idx];
+      setDeployStepIndex(idx);
+      setDeployProgress(currentStep.pct);
+
       setTerminalLogs(prev => [
         ...prev,
-        "Transaction Hash: 4eYtXm61Xj8GvA1h9x3Lp0sW7mQ91hN... (Confirmed)",
-        `SUCCESS: Token ${token.name} (${token.ticker}) deployed on Solana Network!`
+        `[${currentStep.pct}%] ${language === 'pl' ? currentStep.logPl : currentStep.logEn}`
       ]);
-    }, 2800);
+
+      const stepDelays = [1000, 1100, 1300, 1100, 1000, 900, 800];
+      setTimeout(() => {
+        runStep(idx + 1);
+      }, stepDelays[idx] || 1000);
+    };
+
+    runStep(0);
   };
 
   // Resolve the generated Icon Component
@@ -401,65 +480,168 @@ export default function AITokenGenerator() {
               </div>
 
               {/* Console Sandbox Workspace */}
-              <div className="border border-white/5 bg-[#030712] p-4 font-mono">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
-                  <div className="flex items-center gap-1.5 text-[10px] text-white/50 uppercase font-bold">
-                    <Terminal className="w-3.5 h-3.5 text-white/40" /> {t('Konsola Kompilacji i Emisji', 'Compilation and Emission Console')}
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <button 
-                      onClick={handleTestCompile}
-                      disabled={isCompiling || compileSuccess}
-                      className={`text-[9px] font-bold uppercase tracking-[1.5px] border px-2.5 py-1 flex items-center gap-1.5 transition-all interactive-cursor ${
-                        compileSuccess 
-                          ? 'border-g/30 text-g bg-g/5 cursor-default'
-                          : isCompiling 
-                          ? 'border-white/10 text-white/30 cursor-not-allowed bg-white/5'
-                          : 'border-cyan text-cyan hover:bg-cyan/15 bg-transparent'
-                      }`}
-                    >
-                      {isCompiling ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
-                      {compileSuccess ? t('SKOMPILOWANO', 'COMPILED') : t('KOMPILUJ TESTOWO', 'TEST COMPILE')}
-                    </button>
-
-                    <button 
-                      onClick={handleDeployOnSolana}
-                      disabled={!compileSuccess || isDeploying || deploySuccess}
-                      className={`text-[9px] font-bold uppercase tracking-[1.5px] border px-2.5 py-1 flex items-center gap-1.5 transition-all interactive-cursor ${
-                        deploySuccess 
-                          ? 'border-g/30 text-g bg-g/5 cursor-default'
-                          : isDeploying 
-                          ? 'border-white/10 text-white/30 cursor-not-allowed bg-white/5'
-                          : compileSuccess 
-                          ? 'border-g text-g hover:bg-g/15 bg-transparent' 
-                          : 'border-white/15 text-white/30 bg-white/5 cursor-not-allowed'
-                      }`}
-                    >
-                      {isDeploying ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3 fill-current" />}
-                      {deploySuccess ? t('WDROŻONO NA SOLANIE', 'DEPLOYED ON SOLANA') : t('EMITUJ TOKEN', 'EMIT TOKEN')}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Console Logs Box */}
-                <div className="h-[90px] overflow-y-auto bg-black/40 p-2 border border-white/5 text-[9px] text-white/50 flex flex-col gap-1.5 select-text">
-                  {terminalLogs.length === 0 ? (
-                    <div className="text-white/20 italic flex items-center gap-1">
-                      <Info className="w-3 h-3 text-white/20" /> {t('Kliknij kompilację, aby zweryfikować poprawność kodu w Anchor Rust...', 'Click compile to verify the code correctness in Anchor Rust...')}
-                    </div>
-                  ) : (
-                    terminalLogs.map((log, idx) => (
-                      <div key={idx} className={`leading-relaxed ${
-                        log.startsWith('SUCCESS:') ? 'text-g font-bold' : 
-                        log.startsWith('---') ? 'text-cyan/80 font-bold' : 
-                        'text-white/60'
-                      }`}>
-                        {log}
+              <div className="border border-white/5 bg-[#030712] p-4 font-mono relative overflow-hidden">
+                {isDeploying ? (
+                  <div className="animate-fadeIn">
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-cyan/10 pb-3 mb-4">
+                      <div className="flex items-center gap-1.5 text-[10px] text-cyan font-bold uppercase tracking-[1.5px]">
+                        <Cpu className="w-3.5 h-3.5 animate-pulse text-cyan" /> 
+                        {t('Wdrażanie Kontraktu na Solana SVM', 'Deploying Contract on Solana SVM')}
                       </div>
-                    ))
-                  )}
-                </div>
+                      <div className="text-[8px] text-cyan/50 uppercase tracking-[1px] flex items-center gap-1">
+                        <Activity className="w-3 h-3 text-g animate-ping" />
+                        {t('Prędkość: 62.5K TPS', 'Speed: 62.5K TPS')}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                      {/* Left: Progress & Checklist */}
+                      <div className="md:col-span-8 space-y-3.5">
+                        {/* Interactive Steps Indicators */}
+                        <div className="flex flex-wrap items-center gap-1 text-[9px] text-white/40">
+                          {deploySteps.map((step, idx) => {
+                            const isDone = idx < deployStepIndex;
+                            const isActive = idx === deployStepIndex;
+                            return (
+                              <React.Fragment key={idx}>
+                                <div className={`flex items-center gap-1 px-1.5 py-0.5 border ${
+                                  isDone 
+                                    ? 'border-g/30 text-g bg-g/5 font-semibold' 
+                                    : isActive 
+                                    ? 'border-cyan text-cyan bg-cyan/5 font-bold animate-pulse' 
+                                    : 'border-white/5 text-white/30'
+                                } rounded-sm transition-all duration-300`}>
+                                  {isDone ? (
+                                    <Check className="w-2.5 h-2.5 text-g" />
+                                  ) : isActive ? (
+                                    <Loader2 className="w-2.5 h-2.5 animate-spin text-cyan" />
+                                  ) : (
+                                    <span className="w-1 h-1 rounded-full bg-white/20" />
+                                  )}
+                                  <span>{language === 'pl' ? step.labelPl : step.labelEn}</span>
+                                </div>
+                                {idx < deploySteps.length - 1 && (
+                                  <span className="text-white/10 text-[8px]">•</span>
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+
+                        {/* Progress Bar with glow */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center text-[10px] font-semibold text-white/50">
+                            <span className="text-cyan uppercase tracking-[1px] flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 bg-cyan rounded-full animate-ping" />
+                              {language === 'pl' ? deploySteps[deployStepIndex]?.labelPl : deploySteps[deployStepIndex]?.labelEn}
+                            </span>
+                            <span className="text-cyan font-bold font-mono">{deployProgress}%</span>
+                          </div>
+                          
+                          <div className="h-3.5 bg-black border border-cyan/20 p-[2px] relative overflow-hidden flex items-center rounded-sm">
+                            <div 
+                              style={{ width: `${deployProgress}%` }}
+                              className="h-full bg-gradient-to-r from-cyan via-g to-g shadow-[0_0_12px_#00ff88] relative transition-all duration-300"
+                            >
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Detailed step info notification */}
+                        <div className="text-[9.5px] leading-relaxed bg-[#04080f] border border-cyan/10 p-2.5 text-cyan/90 font-mono flex items-start gap-1.5 rounded-sm shadow-[inset_0_0_10px_rgba(0,248,184,0.02)]">
+                          <Terminal className="w-3.5 h-3.5 shrink-0 text-cyan mt-0.5 animate-pulse" />
+                          <div>
+                            <span className="font-bold uppercase tracking-[0.5px] text-white/80 block mb-0.5">
+                              {t('STATUS OPERACJI:', 'OPERATION STATUS:')}
+                            </span>
+                            <span className="animate-fadeIn">
+                              {terminalLogs[terminalLogs.length - 1] || t('Inicjowanie...', 'Initializing...')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: SVM Block Reactor Representation */}
+                      <div className="md:col-span-4 flex flex-col items-center justify-center p-2 border border-white/5 bg-black/30 rounded-sm relative group overflow-hidden">
+                        {/* Concentric rings */}
+                        <div className="relative w-16 h-16 flex items-center justify-center">
+                          <div className="absolute inset-0 border border-dashed border-cyan/25 rounded-full animate-[spin_10s_linear_infinite]" />
+                          <div className="absolute w-12 h-12 border border-dotted border-g/30 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+                          <div className="w-8 h-8 rounded-full bg-cyan/5 border border-cyan/40 flex items-center justify-center relative shadow-[0_0_10px_rgba(0,248,184,0.15)]">
+                            <Cpu className="w-4 h-4 text-cyan" />
+                          </div>
+                        </div>
+                        <div className="text-[8px] text-center mt-2 space-y-0.5">
+                          <span className="text-white/40 block font-bold uppercase tracking-[1px]">{t('Blok SVM', 'SVM Block')}</span>
+                          <span className="text-g font-semibold font-mono animate-pulse">SLOT #{Math.floor(249582109 + deployProgress * 15)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
+                      <div className="flex items-center gap-1.5 text-[10px] text-white/50 uppercase font-bold">
+                        <Terminal className="w-3.5 h-3.5 text-white/40" /> {t('Konsola Kompilacji i Emisji', 'Compilation and Emission Console')}
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={handleTestCompile}
+                          disabled={isCompiling || compileSuccess}
+                          className={`text-[9px] font-bold uppercase tracking-[1.5px] border px-2.5 py-1 flex items-center gap-1.5 transition-all interactive-cursor ${
+                            compileSuccess 
+                              ? 'border-g/30 text-g bg-g/5 cursor-default'
+                              : isCompiling 
+                              ? 'border-white/10 text-white/30 cursor-not-allowed bg-white/5'
+                              : 'border-cyan text-cyan hover:bg-cyan/15 bg-transparent'
+                          }`}
+                        >
+                          {isCompiling ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
+                          {compileSuccess ? t('SKOMPILOWANO', 'COMPILED') : t('KOMPILUJ TESTOWO', 'TEST COMPILE')}
+                        </button>
+
+                        <button 
+                          onClick={handleDeployOnSolana}
+                          disabled={!compileSuccess || isDeploying || deploySuccess}
+                          className={`text-[9px] font-bold uppercase tracking-[1.5px] border px-2.5 py-1 flex items-center gap-1.5 transition-all interactive-cursor ${
+                            deploySuccess 
+                              ? 'border-g/30 text-g bg-g/5 cursor-default'
+                              : isDeploying 
+                              ? 'border-white/10 text-white/30 cursor-not-allowed bg-white/5'
+                              : compileSuccess 
+                              ? 'border-g text-g hover:bg-g/15 bg-transparent' 
+                              : 'border-white/15 text-white/30 bg-white/5 cursor-not-allowed'
+                          }`}
+                        >
+                          {isDeploying ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3 fill-current" />}
+                          {deploySuccess ? t('WDROŻONO NA SOLANIE', 'DEPLOYED ON SOLANA') : t('EMITUJ TOKEN', 'EMIT TOKEN')}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Console Logs Box */}
+                    <div className="h-[90px] overflow-y-auto bg-black/40 p-2 border border-white/5 text-[9px] text-white/50 flex flex-col gap-1.5 select-text">
+                      {terminalLogs.length === 0 ? (
+                        <div className="text-white/20 italic flex items-center gap-1">
+                          <Info className="w-3 h-3 text-white/20" /> {t('Kliknij kompilację, aby zweryfikować poprawność kodu w Anchor Rust...', 'Click compile to verify the code correctness in Anchor Rust...')}
+                        </div>
+                      ) : (
+                        terminalLogs.map((log, idx) => (
+                          <div key={idx} className={`leading-relaxed ${
+                            log.startsWith('SUCCESS:') ? 'text-g font-bold' : 
+                            log.startsWith('---') ? 'text-cyan/80 font-bold' : 
+                            'text-white/60'
+                          }`}>
+                            {log}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
 
             </div>

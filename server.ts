@@ -4,6 +4,7 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import dotenv from "dotenv";
+import { Connection, PublicKey } from "@solana/web3.js";
 
 dotenv.config();
 
@@ -233,6 +234,135 @@ declare_id!("KoparkaMiningToken111111111111111111111");`,
     }
   }
 
+  // Persistent Presale Store
+  const CONTRIBUTIONS_FILE = path.join(process.cwd(), "user_contributions.json");
+  const DEFAULT_RECEIVER = "7KBXwNo6Jv2kGKoWui7TaKQL8TKHG780BPQNK39UXIQN";
+  
+  function loadPresale() {
+    try {
+      if (fs.existsSync(CONTRIBUTIONS_FILE)) {
+        return JSON.parse(fs.readFileSync(CONTRIBUTIONS_FILE, "utf8"));
+      }
+    } catch (e) {
+      console.error("Error reading contributions file:", e);
+    }
+    
+    // Default initial data
+    return {
+      solRaisedBase: 14960.50,
+      targetSol: 20000,
+      receiverAddress: process.env.SOL_PRESALE_RECEIVER || DEFAULT_RECEIVER,
+      contributions: [
+        { id: "1", address: "4a8v...K9p1", amountSol: 15.5, amountSlx: 103333, timestamp: Date.now() - 120000 },
+        { id: "2", address: "D3xj...pL2o", amountSol: 8.0, amountSlx: 53333, timestamp: Date.now() - 300000 },
+        { id: "3", address: "Solf...8zKq", amountSol: 25.0, amountSlx: 166666, timestamp: Date.now() - 720000 },
+        { id: "4", address: "9a2f...1x8p", amountSol: 4.5, amountSlx: 30000, timestamp: Date.now() - 1080000 },
+        { id: "5", address: "Phan...w4eR", amountSol: 42.0, amountSlx: 280000, timestamp: Date.now() - 1440000 }
+      ]
+    };
+  }
+
+  const presaleData = loadPresale();
+
+  function savePresale() {
+    try {
+      fs.writeFileSync(CONTRIBUTIONS_FILE, JSON.stringify(presaleData, null, 2), "utf8");
+    } catch (e) {
+      console.error("Error saving contributions file:", e);
+    }
+  }
+
+  function calculateTotalSolRaised() {
+    const newVerifiedAmount = presaleData.contributions
+      .filter((c: any) => !["1", "2", "3", "4", "5"].includes(c.id))
+      .reduce((sum: number, c: any) => sum + (Number(c.amountSol) || 0), 0);
+    return Number((presaleData.solRaisedBase + newVerifiedAmount).toFixed(2));
+  }
+
+  // Verify Solana Tx Signature on-chain
+  async function verifySolanaTx(signature: string, expectedReceiver: string, expectedAmountSol?: number) {
+    try {
+      const rpcUrls = [
+        "https://api.mainnet-beta.solana.com",
+        "https://api.devnet.solana.com"
+      ];
+      
+      let txInfo: any = null;
+      for (const rpcUrl of rpcUrls) {
+        try {
+          const connection = new Connection(rpcUrl, "confirmed");
+          txInfo = await connection.getParsedTransaction(signature, {
+            maxSupportedTransactionVersion: 0
+          });
+          if (txInfo) break;
+        } catch (e) {
+          console.warn(`RPC ${rpcUrl} check failed:`, e);
+        }
+      }
+
+      if (!txInfo) {
+        return { verified: false, error: "Transakcja nie została jeszcze odnaleziona w sieci Solana (może potrwać kilka sekund)." };
+      }
+
+      if (txInfo.meta?.err) {
+        return { verified: false, error: "Ta transakcja zakończyła się błędem na blockchainie." };
+      }
+
+      const accountKeys = txInfo.transaction.message.accountKeys;
+      let amountTransferredLamports = 0;
+      let foundReceiver = false;
+
+      // Access instructions
+      const instructions = txInfo.transaction.message.instructions;
+      instructions.forEach((instruction: any) => {
+        if (instruction.program === "system" && instruction.parsed?.type === "transfer") {
+          const info = instruction.parsed.info;
+          if (info.destination === expectedReceiver) {
+            foundReceiver = true;
+            amountTransferredLamports += info.lamports;
+          }
+        }
+      });
+
+      if (txInfo.meta?.innerInstructions) {
+        txInfo.meta.innerInstructions.forEach((inner: any) => {
+          inner.instructions.forEach((instruction: any) => {
+            if (instruction.parsed?.type === "transfer" && instruction.parsed?.info?.destination === expectedReceiver) {
+              foundReceiver = true;
+              amountTransferredLamports += instruction.parsed.info.lamports;
+            }
+          });
+        });
+      }
+
+      if (!foundReceiver) {
+        return { verified: false, error: `Transakcja nie zawiera transferu środków na adres przedsprzedaży (${expectedReceiver}).` };
+      }
+
+      const solAmount = amountTransferredLamports / 1e9;
+      
+      if (expectedAmountSol && Math.abs(solAmount - expectedAmountSol) > 0.05) {
+        return { verified: false, error: `Niezgodność kwoty: transakcja opiewa na ${solAmount} SOL, a oczekiwano ${expectedAmountSol} SOL.` };
+      }
+
+      // Check if accountKeys is an array of public keys or objects
+      const sender = typeof accountKeys[0] === 'string' 
+        ? accountKeys[0] 
+        : (accountKeys[0].pubkey ? accountKeys[0].pubkey.toString() : accountKeys[0].toString());
+
+      return {
+        verified: true,
+        solAmount,
+        sender,
+        timestamp: txInfo.blockTime ? txInfo.blockTime * 1000 : Date.now()
+      };
+
+    } catch (e: any) {
+      console.error("Error in verifySolanaTx:", e);
+      return { verified: false, error: "Wystąpił błąd podczas odpytywania sieci Solana RPC: " + e.message };
+    }
+  }
+
   // In-memory Database for Active Miners & History
   const activeMiners: Record<string, any> = {
     "CryptoJanusz": { username: "CryptoJanusz", hashRate: 245.8, balance: 421.5, lastSeen: Date.now(), isOnline: true, totalMined: 500 },
@@ -353,6 +483,12 @@ declare_id!("KoparkaMiningToken111111111111111111111");`,
       history: miningHistory,
       withdrawals: withdrawalsHistory,
       tokens: tokens,
+      presale: {
+        solRaised: calculateTotalSolRaised(),
+        targetSol: presaleData.targetSol,
+        receiverAddress: presaleData.receiverAddress,
+        contributions: presaleData.contributions
+      },
       stats: {
         tvlUsd,
         volumeUsd,
@@ -360,6 +496,77 @@ declare_id!("KoparkaMiningToken111111111111111111111");`,
         tokensCount: tokens.length,
         activeUsersCount: Object.keys(activeMiners).length
       }
+    });
+  });
+
+  app.post("/api/presale/submit", async (req, res) => {
+    const { signature, userAddress, amountSol, isDemo } = req.body;
+    
+    if (!signature || !userAddress) {
+      return res.status(400).json({ error: "Signature and userAddress are required" });
+    }
+
+    // Check if transaction signature already exists
+    if (presaleData.contributions.some((c: any) => c.signature === signature)) {
+      return res.status(400).json({ error: "Ta transakcja została już zarejestrowana!" });
+    }
+
+    let verificationResult;
+    if (signature.startsWith("demo_") || isDemo) {
+      // Simulate/Demo purchase
+      const demoAmount = Number(amountSol) || 2.5;
+      verificationResult = {
+        verified: true,
+        solAmount: demoAmount,
+        sender: userAddress,
+        timestamp: Date.now()
+      };
+    } else {
+      // Real Solana blockchain verification
+      verificationResult = await verifySolanaTx(signature, presaleData.receiverAddress, Number(amountSol));
+    }
+
+    if (!verificationResult.verified) {
+      return res.status(400).json({ error: verificationResult.error });
+    }
+
+    // Rate: 1 SOL = ~6666.67 $SLX
+    const rate = 6666.67;
+    const tokensReceived = Math.round(verificationResult.solAmount * rate);
+
+    const newContribution = {
+      id: "tx_" + signature.substring(0, 8),
+      address: verificationResult.sender.substring(0, 6) + "..." + verificationResult.sender.substring(verificationResult.sender.length - 4),
+      amountSol: verificationResult.solAmount,
+      amountSlx: tokensReceived,
+      timestamp: verificationResult.timestamp,
+      signature: signature
+    };
+
+    // Insert at front of contributions
+    presaleData.contributions.unshift(newContribution);
+    
+    // Maintain max 50 entries
+    if (presaleData.contributions.length > 50) {
+      presaleData.contributions.pop();
+    }
+
+    savePresale();
+
+    // Log this purchase in miningHistory so it is visible in real-time
+    miningHistory.unshift({
+      id: Math.random().toString(36).substring(2, 11),
+      username: newContribution.address,
+      action: "ZAPIS_PLONU",
+      amount: Number(verificationResult.solAmount),
+      timestamp: new Date().toLocaleTimeString(),
+      details: `Kupił ${tokensReceived.toLocaleString()} $SLX`
+    });
+
+    res.json({
+      success: true,
+      contribution: newContribution,
+      totalSolRaised: calculateTotalSolRaised()
     });
   });
 

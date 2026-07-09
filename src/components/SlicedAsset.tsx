@@ -1,4 +1,6 @@
 import React from 'react';
+import HERO_SHEET_URL from '../assets/images/solaxy_mascot_hero_1783437956325.jpg';
+import POSES_SHEET_URL from '../assets/images/solaxy_mascot_poses_1783437972677.jpg';
 
 export type SlicedAssetKey =
   // 1024x1024 Sheet (solaxy_mascot_hero_1783437956325.jpg)
@@ -51,9 +53,6 @@ interface SlicedAssetProps {
   className?: string;
   style?: React.CSSProperties;
 }
-
-const HERO_SHEET_URL = '/src/assets/images/solaxy_mascot_hero_1783437956325.jpg';
-const POSES_SHEET_URL = '/src/assets/images/solaxy_mascot_poses_1783437972677.jpg';
 
 interface AssetConfig {
   url: string;
