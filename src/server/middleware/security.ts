@@ -31,6 +31,7 @@ export const apiRateLimiter = rateLimit({
   max: 300, // limit each IP to 300 requests per windowMs
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  validate: { trustProxy: false }, // Suppress proxy validation warnings in the container environment
   message: {
     error: "Zbyt wiele żądań z tego adresu IP. Spróbuj ponownie za 15 minut."
   }

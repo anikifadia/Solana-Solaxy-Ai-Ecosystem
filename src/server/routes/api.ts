@@ -40,7 +40,8 @@ const deployTokenSchema = z.object({
     supply: z.number().positive(),
     iconType: z.string().optional(),
     colorGradient: z.string().optional(),
-    anchorCode: z.string().optional()
+    anchorCode: z.string().optional(),
+    customSvg: z.string().optional()
   })
 });
 
@@ -190,7 +191,7 @@ router.post("/presale/submit", validateRequest(submitPresaleSchema), async (req,
 
 // 4. Token Deployment
 router.post("/tokens/deploy", validateRequest(deployTokenSchema), (req, res) => {
-  const { name, ticker, description, supply, iconType, colorGradient, anchorCode } = req.body;
+  const { name, ticker, description, supply, iconType, colorGradient, anchorCode, customSvg } = req.body;
 
   const formattedTicker = ticker.startsWith('$') ? ticker : `$${ticker}`;
 
@@ -209,6 +210,7 @@ router.post("/tokens/deploy", validateRequest(deployTokenSchema), (req, res) => 
     iconType: iconType || "Coins",
     colorGradient: colorGradient || "from-g to-cyan",
     anchorCode: anchorCode || "",
+    customSvg: customSvg || "",
     initialPool,
     remainingPool: initialPool,
     priceSol: 0.00001 + Math.random() * 0.0005,

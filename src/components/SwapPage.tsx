@@ -97,6 +97,7 @@ export default function SwapPage({
                           iconType={tok.iconType} 
                           colorGradient={tok.colorGradient} 
                           size="md"
+                          customSvg={tok.customSvg}
                         />
                         <div>
                           <div className="flex items-center gap-2">
@@ -185,6 +186,7 @@ export default function SwapPage({
                         iconType={selectedTokenForTrade.iconType} 
                         colorGradient={selectedTokenForTrade.colorGradient} 
                         size="sm" 
+                        customSvg={selectedTokenForTrade.customSvg}
                       />
                       <span className="font-mono text-xs text-cyan bg-cyan/5 border border-cyan/30 px-2 py-0.5">{selectedTokenForTrade.ticker}</span>
                     </div>

@@ -17,6 +17,7 @@ interface GeneratedToken {
   iconType: string;
   colorGradient: string;
   anchorCode: string;
+  customSvg?: string;
 }
 
 const IconMap: { [key: string]: React.ComponentType<any> } = {
@@ -285,7 +286,8 @@ export default function AITokenGenerator() {
                 supply: token.supply,
                 iconType: token.iconType,
                 colorGradient: token.colorGradient,
-                anchorCode: token.anchorCode
+                anchorCode: token.anchorCode,
+                customSvg: token.customSvg
               })
             });
 
@@ -584,6 +586,7 @@ export default function AITokenGenerator() {
                       iconType={token.iconType} 
                       colorGradient={token.colorGradient} 
                       size="lg"
+                      customSvg={token.customSvg}
                     />
                     <div>
                       <div className="text-sm font-bold text-white tracking-[1px]">{token.name}</div>

@@ -16,6 +16,7 @@ interface TokenHDIconProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
   animate?: boolean;
+  customSvg?: string;
 }
 
 export default function TokenHDIcon({
@@ -25,6 +26,7 @@ export default function TokenHDIcon({
   size = 'md',
   className = '',
   animate = true,
+  customSvg,
 }: TokenHDIconProps) {
   const IconComponent = IconMap[iconType] || Coins;
   
@@ -94,9 +96,17 @@ export default function TokenHDIcon({
             
             {/* 3. The actual core glowing Icon with gradient overlay */}
             <div className={`relative z-10 flex flex-col items-center justify-center text-center text-white`}>
-              <div className={`bg-gradient-to-r ${colorGradient} bg-clip-text text-transparent flex items-center justify-center`}>
-                <IconComponent className={`${iconSizes[size]} drop-shadow-[0_0_8px_${glowColor}]`} />
-              </div>
+              {customSvg ? (
+                <div 
+                  className={`flex items-center justify-center ${iconSizes[size]} select-none pointer-events-none [&>svg]:w-full [&>svg]:h-full [&>svg]:block`}
+                  style={{ filter: `drop-shadow(0 0 8px ${glowColor})` }}
+                  dangerouslySetInnerHTML={{ __html: customSvg }}
+                />
+              ) : (
+                <div className={`bg-gradient-to-r ${colorGradient} bg-clip-text text-transparent flex items-center justify-center`}>
+                  <IconComponent className={`${iconSizes[size]} drop-shadow-[0_0_8px_${glowColor}]`} />
+                </div>
+              )}
               
               {/* Embossed Symbol text identifier at the bottom in micro font */}
               {size !== 'sm' && (

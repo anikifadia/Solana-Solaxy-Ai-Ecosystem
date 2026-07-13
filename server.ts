@@ -12,6 +12,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Enable trust proxy for express-rate-limit to work correctly behind reverse proxies
+  app.set("trust proxy", 1);
+
   // 1. Initialize persistent storage files & simulation streams
   console.log("[Database] Initializing persistent storage...");
   loadTokens();

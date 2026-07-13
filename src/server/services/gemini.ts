@@ -29,9 +29,28 @@ export async function generateTokenWithGemini(prompt: string): Promise<Generated
         console.log(`[Gemini Service] Model: ${modelName}, Attempt: ${attempt}/${attempts}`);
         const response = await ai.models.generateContent({
           model: modelName,
-          contents: `Create a comprehensive Solana SPL token profile based on this user description: "${prompt}". Highlight its extreme potential (x1000 gem) in Polish, since the marketing language of Polish meme/crypto enthusiasts likes words like "gem", "pompa", "moon", "skarb", "krypto". Ensure the descriptions are catchy and fully localized.`,
+          contents: `Create an elite Solana SPL token profile and a beautiful vector coin SVG miniature based on this user description: "${prompt}". Highlight its extreme potential (x1000 gem) in Polish, since the marketing language of Polish meme/crypto enthusiasts likes words like "gem", "pompa", "moon", "skarb", "krypto". Ensure the descriptions are catchy and fully localized.`,
           config: {
-            systemInstruction: "You are an elite Solana tokenomics designer and Rust smart-contract engineer. You must generate structured token details and write full, functional Solana Anchor framework Rust code for a custom SPL token or meme token. Return the output strictly in JSON according to the schema provided.",
+            systemInstruction: `You are an elite Solana tokenomics designer and senior Rust smart-contract engineer. 
+You must generate structured token details, write complete, fully functional and realistic Solana Anchor framework Rust code, and construct a beautiful, custom flat vector SVG logo representing the token.
+
+For 'anchorCode':
+Generate a REAL, complete, and syntactically correct Solana Anchor program (Rust code). 
+The program MUST use correct imports ('use anchor_lang::prelude::*;', 'use anchor_spl::token::{self, Mint, Token, TokenAccount};') and contain actual complete implementations for:
+- 'initialize': sets up the mint and initial state, checks authorities, and logs info.
+- 'mint_to': verifies the mint authority signature and mints new supply to the destination token account.
+- 'transfer': transfers token balances securely between user token accounts.
+- 'burn': burns a specified amount of tokens from a user account, adjusting supply (vital for deflationary mechanics).
+- 'set_authority': safely transfers mint/freeze authority or renounces it entirely (setting it to None/null) for 100% security.
+Ensure you use custom Anchor errors, event logs, and proper account validation macros. Do not use generic mock comments or pseudo-code. Write full, clean Rust.
+
+For 'customSvg':
+Create a stunning, highly detailed, and futuristic vector graphic matching the token concept. 
+- Use standard, simple SVG elements (e.g., <svg>, <path>, <circle>, <g>, <defs>, <linearGradient>).
+- Use viewBox="0 0 100 100". Do NOT include absolute width or height.
+- Use glowing neon gradients and beautiful futuristic or meme geometry representing the token (e.g., stylized dog head, rocket, lightning, cat, crown, space portal).
+- Ensure it is valid XML. Return the SVG string directly inside the JSON without any markdown backticks, comments, or XML prolog.
+- Fill the elements with brilliant colors that harmonize with the requested 'colorGradient'.`,
             responseMimeType: "application/json",
             responseSchema: {
               type: Type.OBJECT,
@@ -62,10 +81,14 @@ export async function generateTokenWithGemini(prompt: string): Promise<Generated
                 },
                 anchorCode: {
                   type: Type.STRING,
-                  description: "Fully readable, beautiful Solana Anchor framework Rust smart contract program code to instantiate, mint, and control this custom SPL token. Use code comments."
+                  description: "The complete, beautiful, and realistic Solana Anchor framework Rust smart contract program code with full initialize, mint_to, transfer, burn, and set_authority handlers."
+                },
+                customSvg: {
+                  type: Type.STRING,
+                  description: "A highly stylized, professional flat vector SVG logo representing the token theme. Keep it valid XML, compact, with viewBox='0 0 100 100' and no fixed width/height."
                 }
               },
-              required: ["name", "ticker", "description", "supply", "iconType", "colorGradient", "anchorCode"]
+              required: ["name", "ticker", "description", "supply", "iconType", "colorGradient", "anchorCode", "customSvg"]
             }
           }
         });

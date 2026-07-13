@@ -6,6 +6,7 @@ export interface GeneratedToken {
   iconType: string;
   colorGradient: string;
   anchorCode: string;
+  customSvg?: string;
   initialPool?: number;
   remainingPool?: number;
   priceSol?: number;
