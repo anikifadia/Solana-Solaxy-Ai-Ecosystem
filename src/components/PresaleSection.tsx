@@ -83,12 +83,12 @@ export const PresaleSection: React.FC = () => {
   // --- Wallet & Form State ---
   const [walletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
-  const [walletType, setWalletType] = useState<'Phantom' | 'Solflare' | 'Demo' | 'Manual' | null>(null);
+  const [walletType, setWalletType] = useState<'Phantom' | 'Solflare' | 'Beta' | 'Manual' | null>(null);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   
   const [payAmount, setPayAmount] = useState('2.5');
-  const [isDemoMode, setIsDemoMode] = useState(true); // Default to Demo Mode for testing, can toggle
+  const [isDemoMode, setIsDemoMode] = useState(true); // Default to Beta Mode for testing, can toggle
   const [manualSignature, setManualSignature] = useState('');
   const [manualAddressInput, setManualAddressInput] = useState('');
   
@@ -168,8 +168,8 @@ export const PresaleSection: React.FC = () => {
       } else {
         // Fallback if extension not installed
         throw new Error(t(
-          "Nie znaleziono wtyczki Phantom. Zainstaluj Phantom lub użyj trybu demo/manualnego.",
-          "Phantom Wallet extension not found. Install it or use Demo/Manual mode."
+          "Nie znaleziono wtyczki Phantom. Zainstaluj Phantom lub użyj trybu manualnego.",
+          "Phantom Wallet extension not found. Install it or use Manual mode."
         ));
       }
     } catch (e: any) {
@@ -196,8 +196,8 @@ export const PresaleSection: React.FC = () => {
         setTimeout(() => setSuccessMsg(null), 4000);
       } else {
         throw new Error(t(
-          "Nie znaleziono wtyczki Solflare. Zainstaluj Solflare lub użyj trybu demo/manualnego.",
-          "Solflare extension not found. Install it or use Demo/Manual mode."
+          "Nie znaleziono wtyczki Solflare. Zainstaluj Solflare lub użyj trybu manualnego.",
+          "Solflare extension not found. Install it or use Manual mode."
         ));
       }
     } catch (e: any) {
@@ -211,12 +211,12 @@ export const PresaleSection: React.FC = () => {
   const connectDemoWallet = () => {
     setIsConnecting(true);
     setTimeout(() => {
-      setUserAddress("SolDeMo11119A2fZk9zPKoparkaSolaxy");
+      setUserAddress("SolBeta11119A2fZk9zPKoparkaSolaxy");
       setWalletConnected(true);
-      setWalletType('Demo');
+      setWalletType('Beta');
       setShowWalletModal(false);
       setIsConnecting(false);
-      setSuccessMsg(t('Połączono pomyślnie z Sandbox Demo Wallet!', 'Connected successfully with Sandbox Demo Wallet!'));
+      setSuccessMsg(t('Połączono pomyślnie z Solaxy Beta Wallet!', 'Connected successfully with Solaxy Beta Wallet!'));
       setTimeout(() => setSuccessMsg(null), 4000);
     }, 600);
   };
@@ -270,7 +270,7 @@ export const PresaleSection: React.FC = () => {
     setSuccessMsg(null);
 
     try {
-      if (isDemoMode || walletType === 'Demo' || walletType === 'Manual') {
+      if (isDemoMode || walletType === 'Beta' || walletType === 'Manual') {
         // Sandbox / Simulated purchase or manual tracking setup
         const fakeSignature = 'demo_tx_' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
         
@@ -279,7 +279,7 @@ export const PresaleSection: React.FC = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             signature: fakeSignature,
-            userAddress: userAddress || 'SolDemo...Wallet',
+            userAddress: userAddress || 'SolBeta...Wallet',
             amountSol: sol,
             isDemo: true
           })
@@ -307,8 +307,8 @@ export const PresaleSection: React.FC = () => {
 
         setSuccessMsg(
           t(
-            `Zakup udany (TRYB DEMO)! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja została odnotowana w bazie.`,
-            `Purchase successful (DEMO MODE)! Received ${tokensReceived.toLocaleString()} $SLX. Transaction logged in the database.`
+            `Zakup udany (SYMULACJA BETA)! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja została odnotowana w bazie.`,
+            `Purchase successful (BETA SIMULATION)! Received ${tokensReceived.toLocaleString()} $SLX. Transaction logged in the database.`
           )
         );
         fetchPresaleStatus();
@@ -413,7 +413,7 @@ export const PresaleSection: React.FC = () => {
         body: JSON.stringify({
           signature,
           userAddress: userAddress || 'ManualBuyer...Wallet',
-          isDemo: isDemoMode // Respect the demo mode switch
+          isDemo: isDemoMode // Respect the beta mode switch
         })
       });
 
@@ -643,10 +643,10 @@ export const PresaleSection: React.FC = () => {
                   <span className="font-display text-xs tracking-[2px] text-cyan uppercase">{t('BŁYSKAWICZNA WYMIANA', 'PRESALE SWAP')}</span>
                 </div>
                 
-                {/* Demo mode selector */}
+                {/* Beta mode selector */}
                 <div className="flex items-center gap-1.5 px-2 py-0.5 bg-yellow-500/5 border border-yellow-500/20 rounded">
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-                  <span className="text-[7.5px] font-mono text-yellow-400 uppercase tracking-[1px] font-bold">Demo</span>
+                  <span className="text-[7.5px] font-mono text-yellow-400 uppercase tracking-[1px] font-bold">Beta</span>
                   <input 
                     type="checkbox" 
                     checked={isDemoMode}
@@ -827,7 +827,7 @@ export const PresaleSection: React.FC = () => {
               ) : (
                 <>
                   <Zap className="w-3.5 h-3.5 text-cyan" />
-                  {isDemoMode ? t('WYKONAJ TESTOWY SWAP (FREE)', 'EXECUTE TEST SWAP (FREE)') : t('ZATWIERDŹ SWAP (SOLANA)', 'EXECUTE PRESALE BUY')}
+                  {isDemoMode ? t('WYKONAJ SYMULOWANY SWAP (BETA)', 'EXECUTE SIMULATED SWAP (BETA)') : t('ZATWIERDŹ SWAP (SOLANA)', 'EXECUTE PRESALE BUY')}
                 </>
               )}
             </button>
@@ -972,7 +972,7 @@ export const PresaleSection: React.FC = () => {
                     <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-cyan transition-colors" />
                   </button>
 
-                  {/* Sandbox Demo Connector */}
+                  {/* Beta Simulation Connector */}
                   <button
                     onClick={connectDemoWallet}
                     className="flex items-center justify-between p-3 border border-yellow-500/10 bg-yellow-500/5 hover:bg-yellow-500/10 hover:border-yellow-500/50 transition-all rounded text-left group cursor-pointer"
@@ -980,7 +980,7 @@ export const PresaleSection: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 text-yellow-500 text-[10px] font-bold">SOL</div>
                       <div>
-                        <span className="text-xs font-bold text-yellow-400 block">{t('Demo Sandbox Wallet', 'Demo Sandbox Wallet')}</span>
+                        <span className="text-xs font-bold text-yellow-400 block">{t('Beta Simulation Wallet', 'Beta Simulation Wallet')}</span>
                         <span className="text-[8.5px] text-yellow-500/60 block">{t('Bezpośrednia symulacja bez wtyczki', 'Direct simulation without any extension')}</span>
                       </div>
                     </div>
