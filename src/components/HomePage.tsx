@@ -6,12 +6,12 @@ import RoadmapTimeline from './RoadmapTimeline';
 import Wormhole from './Wormhole';
 
 import HERO_IMAGE from '../assets/images/solaxy_mascot_hero_1783437956325.jpg';
-import BEYOND_IMAGE from '../assets/images/solaxy_beyond_chain_1783602087724.jpg';
+import BEYOND_IMAGE from '../assets/images/solaxy_infographic_1783981728892.jpg';
 import POSES_IMAGE from '../assets/images/solaxy_mascot_poses_1783437972677.jpg';
 
 // Re-using same image constants safely
 const HERO_IMG = HERO_IMAGE;
-const BEYOND_IMG = '../assets/images/solaxy_beyond_chain_1783602087724.jpg';
+const BEYOND_IMG = '../assets/images/solaxy_infographic_1783981728892.jpg';
 
 interface HomePageProps {
   t: (pl: string, en: string) => string;
@@ -98,48 +98,7 @@ export default function HomePage({
             />
           </div>
 
-          {/* 5 Horizontal Capability Badges Row */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5 w-full border-t border-white/5 pt-8">
-            <div className="bg-[#03070e]/80 border border-white/5 p-3 flex flex-col items-center justify-center rounded group hover:border-g/30 transition-all duration-300">
-              <div className="w-8 h-8 flex items-center justify-center mb-1">
-                <SlicedAsset asset="icon-fast" className="w-7 h-7" />
-              </div>
-              <span className="text-[10px] font-mono font-bold tracking-[2px] text-g uppercase">FAST</span>
-              <span className="text-[8px] text-white/40 tracking-[0.5px] uppercase mt-0.5">{t('BUILT FOR SPEED', 'BUILT FOR SPEED')}</span>
-            </div>
 
-            <div className="bg-[#03070e]/80 border border-white/5 p-3 flex flex-col items-center justify-center rounded group hover:border-g/30 transition-all duration-300">
-              <div className="w-8 h-8 flex items-center justify-center mb-1">
-                <SlicedAsset asset="icon-secure" className="w-7 h-7" />
-              </div>
-              <span className="text-[10px] font-mono font-bold tracking-[2px] text-g uppercase">SECURE</span>
-              <span className="text-[8px] text-white/40 tracking-[0.5px] uppercase mt-0.5">{t('AUDITED & SAFE', 'AUDITED & SAFE')}</span>
-            </div>
-
-            <div className="bg-[#03070e]/80 border border-white/5 p-3 flex flex-col items-center justify-center rounded group hover:border-g/30 transition-all duration-300">
-              <div className="w-8 h-8 flex items-center justify-center mb-1">
-                <SlicedAsset asset="icon-scalable" className="w-7 h-7" />
-              </div>
-              <span className="text-[10px] font-mono font-bold tracking-[2px] text-g uppercase">SCALABLE</span>
-              <span className="text-[8px] text-white/40 tracking-[0.5px] uppercase mt-0.5">{t('BUILT ON SOLANA', 'BUILT ON SOLANA')}</span>
-            </div>
-
-            <div className="bg-[#03070e]/80 border border-white/5 p-3 flex flex-col items-center justify-center rounded group hover:border-g/30 transition-all duration-300">
-              <div className="w-8 h-8 flex items-center justify-center mb-1">
-                <SlicedAsset asset="icon-community" className="w-7 h-7" />
-              </div>
-              <span className="text-[10px] font-mono font-bold tracking-[2px] text-g uppercase">COMMUNITY</span>
-              <span className="text-[8px] text-white/40 tracking-[0.5px] uppercase mt-0.5">{t('POWERED BY YOU', 'POWERED BY YOU')}</span>
-            </div>
-
-            <div className="bg-[#03070e]/80 border border-white/5 p-3 flex flex-col items-center justify-center rounded col-span-2 sm:col-span-1 group hover:border-g/30 transition-all duration-300">
-              <div className="w-8 h-8 flex items-center justify-center mb-1">
-                <SlicedAsset asset="icon-innovative" className="w-7 h-7" />
-              </div>
-              <span className="text-[10px] font-mono font-bold tracking-[2px] text-g uppercase">INNOVATIVE</span>
-              <span className="text-[8px] text-white/40 tracking-[0.5px] uppercase mt-0.5">{t('FUTURE DRIVEN', 'FUTURE DRIVEN')}</span>
-            </div>
-          </div>
         </section>
 
 

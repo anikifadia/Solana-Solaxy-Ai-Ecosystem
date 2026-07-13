@@ -4,6 +4,7 @@ import { PresaleSection } from './PresaleSection';
 import TokenOrb from './TokenOrb';
 import SecuritySentinel from './SecuritySentinel';
 import { useLanguage } from '../LanguageContext';
+import ScrollReveal from './ScrollReveal';
 import { 
   Flame, ShieldCheck, Cpu, Vote, TrendingUp, Sparkles, Zap, 
   Layers, Coins, Anchor, RefreshCw, BarChart3, HelpCircle, 
@@ -153,8 +154,8 @@ export default function PresalePage({ t }: PresalePageProps) {
       shadowColor: 'rgba(99, 102, 241, 0.4)',
       vestingPl: 'Zablokowane na wypadek incydentów sieciowych lub potrzeb nagłego audytu smart kontraktów.',
       vestingEn: 'Locked for network incidents or emergency smart contract audit needs.',
-      descPl: 'Fundusz ubezpieczeniowy oraz rezerwa dla białych hakerów (Bug Bounty) dbających o bezpieczeństwo Solaxy.',
-      descEn: 'Insurance fund and reserve for white hat hackers (Bug Bounty) maintaining Solaxy security.'
+      descPl: 'Fundusz ubezpieczeniowy oraz rezerwa dla audytorów bezpieczeństwa i badaczy (Bug Bounty) dbających o stabilność Solaxy.',
+      descEn: 'Insurance fund and reserve for security auditors and researchers (Bug Bounty) maintaining Solaxy stability.'
     }
   ];
 
@@ -442,49 +443,53 @@ export default function PresalePage({ t }: PresalePageProps) {
         {/* Glow behind section title */}
         <div className="absolute top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-g/5 rounded-full blur-[150px] pointer-events-none" />
 
-        <div className="text-center mb-16 relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-g/5 border border-g/15 rounded-full text-[9px] tracking-[3px] text-g uppercase mb-4 font-mono">
-            <span className="w-1.5 h-1.5 bg-g rounded-full animate-ping" />
-            {t('SPRAWIEDLIWA EMISJA & ARCHITEKTURA SYGNOWANA AI', 'FAIR LAUNCH & AI SIGNED ARCHITECTURE')}
+        <ScrollReveal direction="up" delay={50} duration={900}>
+          <div className="text-center mb-16 relative">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-g/5 border border-g/15 rounded-full text-[9px] tracking-[3px] text-g uppercase mb-4 font-mono">
+              <span className="w-1.5 h-1.5 bg-g rounded-full animate-ping" />
+              {t('SPRAWIEDLIWA EMISJA & ARCHITEKTURA SYGNOWANA AI', 'FAIR LAUNCH & AI SIGNED ARCHITECTURE')}
+            </div>
+            <h2 className="font-display text-4xl sm:text-6xl uppercase tracking-[2px] font-black">
+              Tokenomika <span className="text-g text-shadow-[0_0_15px_rgba(0,255,136,0.3)]">$SLX</span>
+            </h2>
+            <p className="text-sm text-[#c8e6d2]/60 max-w-3xl mx-auto mt-4 leading-relaxed">
+              {t(
+                'Projekt Solaxy został zaprojektowany z myślą o wieloletnim wzroście i maksymalizacji realnej użyteczności. Całkowita, stała podaż wynosi 10 000 000 000 $SLX bez możliwości ponownego wybicia (mintowania). Każdy mechanizm wspiera deflację i lojalnych stakerów.',
+                'The Solaxy project is engineered for long-term compounding growth and absolute utility. Total fixed supply is capped at 10,000,000,000 $SLX with no reminting capabilities. Every mechanism supports deflation and loyal stakers.'
+              )}
+            </p>
           </div>
-          <h2 className="font-display text-4xl sm:text-6xl uppercase tracking-[2px] font-black">
-            Tokenomika <span className="text-g text-shadow-[0_0_15px_rgba(0,255,136,0.3)]">$SLX</span>
-          </h2>
-          <p className="text-sm text-[#c8e6d2]/60 max-w-3xl mx-auto mt-4 leading-relaxed">
-            {t(
-              'Projekt Solaxy został zaprojektowany z myślą o wieloletnim wzroście i maksymalizacji realnej użyteczności. Całkowita, stała podaż wynosi 10 000 000 000 $SLX bez możliwości ponownego wybicia (mintowania). Każdy mechanizm wspiera deflację i lojalnych stakerów.',
-              'The Solaxy project is engineered for long-term compounding growth and absolute utility. Total fixed supply is capped at 10,000,000,000 $SLX with no reminting capabilities. Every mechanism supports deflation and loyal stakers.'
-            )}
-          </p>
-        </div>
+        </ScrollReveal>
 
         {/* TAB NAVIGATION FOR PREMIUM DASHBOARD */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12 border-b border-white/10 pb-4 relative z-10">
-          {[
-            { id: 'distribution', labelPl: 'Dystrybucja i Vesting', labelEn: 'Distribution & Vesting', icon: Layers },
-            { id: 'utility', labelPl: 'Użyteczność Tokena', labelEn: 'Token Utility', icon: Coins },
-            { id: 'deflation', labelPl: 'Mechanizmy Deflacyjne', labelEn: 'Deflationary Engine', icon: Flame },
-            { id: 'governance', labelPl: 'Zarządzanie DAO', labelEn: 'DAO Governance', icon: Vote },
-            { id: 'roadmap', labelPl: 'Strategia Rozwoju', labelEn: 'Roadmap Strategy', icon: Compass }
-          ].map((tab) => {
-            const TabIcon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-xs font-mono uppercase tracking-[1px] border transition-all duration-300 select-none cursor-pointer ${
-                  active 
-                    ? 'border-g bg-g/5 text-g shadow-[0_0_15px_rgba(0,255,136,0.15)]' 
-                    : 'border-white/10 bg-white/[0.02] text-white/50 hover:text-white hover:border-white/20'
-                }`}
-              >
-                <TabIcon className="w-4 h-4" />
-                <span>{t(tab.labelPl, tab.labelEn)}</span>
-              </button>
-            );
-          })}
-        </div>
+        <ScrollReveal direction="up" delay={150} duration={850}>
+          <div className="flex flex-wrap justify-center gap-2 mb-12 border-b border-white/10 pb-4 relative z-10">
+            {[
+              { id: 'distribution', labelPl: 'Dystrybucja i Vesting', labelEn: 'Distribution & Vesting', icon: Layers },
+              { id: 'utility', labelPl: 'Użyteczność Tokena', labelEn: 'Token Utility', icon: Coins },
+              { id: 'deflation', labelPl: 'Mechanizmy Deflacyjne', labelEn: 'Deflationary Engine', icon: Flame },
+              { id: 'governance', labelPl: 'Zarządzanie DAO', labelEn: 'DAO Governance', icon: Vote },
+              { id: 'roadmap', labelPl: 'Strategia Rozwoju', labelEn: 'Roadmap Strategy', icon: Compass }
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-mono uppercase tracking-[1px] border transition-all duration-300 select-none cursor-pointer ${
+                    active 
+                      ? 'border-g bg-g/5 text-g shadow-[0_0_15px_rgba(0,255,136,0.15)]' 
+                      : 'border-white/10 bg-white/[0.02] text-white/50 hover:text-white hover:border-white/20'
+                  }`}
+                >
+                  <TabIcon className="w-4 h-4" />
+                  <span>{t(tab.labelPl, tab.labelEn)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </ScrollReveal>
 
         {/* TAB 1: DISTRIBUTION & VESTING (INTERACTIVE GRAPHICAL MATRIX) */}
         {activeTab === 'distribution' && (
@@ -496,7 +501,8 @@ export default function PresalePage({ t }: PresalePageProps) {
           >
             
             {/* Interactive SVG Pie/Donut Chart Visualizer & Info Banner */}
-            <div className="lg:col-span-5 border border-white/10 bg-black/40 backdrop-blur-md p-6 flex flex-col justify-between relative overflow-hidden rounded-lg">
+            <ScrollReveal direction="left" delay={50} duration={850} className="lg:col-span-5 flex flex-col">
+              <div className="w-full h-full border border-white/10 bg-black/40 backdrop-blur-md p-6 flex flex-col justify-between relative overflow-hidden rounded-lg">
               <div className="absolute top-0 right-0 w-32 h-[1px] bg-gradient-to-r from-transparent to-g shadow-[0_0_8px_#00ff88]" />
               <div className="absolute bottom-0 left-0 w-32 h-[1px] bg-gradient-to-r from-g to-transparent shadow-[0_0_8px_#00ff88]" />
 
@@ -582,9 +588,11 @@ export default function PresalePage({ t }: PresalePageProps) {
               </div>
 
             </div>
+            </ScrollReveal>
 
             {/* Distribution Categories Interactive Stack and Vesting Calculator */}
-            <div className="lg:col-span-7 flex flex-col gap-6">
+            <ScrollReveal direction="right" delay={150} duration={850} className="lg:col-span-7 flex flex-col">
+              <div className="w-full h-full flex flex-col gap-6">
               
               {/* Categories scrollable/interactive list */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -705,7 +713,8 @@ export default function PresalePage({ t }: PresalePageProps) {
 
               </div>
 
-            </div>
+              </div>
+            </ScrollReveal>
 
           </motion.div>
         )}
@@ -732,33 +741,35 @@ export default function PresalePage({ t }: PresalePageProps) {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {utilities.map((ut, idx) => {
-                const IconComp = ut.icon;
-                return (
-                  <div 
-                    key={idx}
-                    className="p-4 bg-white/[0.01] border border-white/5 hover:border-g/30 hover:bg-g/[0.02] transition-all duration-300 relative group rounded"
-                  >
-                    <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-white/15 group-hover:border-g transition-colors" />
-                    <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-white/15 group-hover:border-g transition-colors" />
-                    
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 bg-white/5 border border-white/10 group-hover:bg-g/10 group-hover:border-g/20 transition-all rounded-sm">
-                        <IconComp className={`w-4 h-4 ${ut.color}`} />
+            <ScrollReveal direction="up" delay={50} duration={800}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {utilities.map((ut, idx) => {
+                  const IconComp = ut.icon;
+                  return (
+                    <div 
+                      key={idx}
+                      className="p-4 bg-white/[0.01] border border-white/5 hover:border-g/30 hover:bg-g/[0.02] transition-all duration-300 relative group rounded"
+                    >
+                      <div className="absolute top-0 right-0 w-1.5 h-1.5 border-t border-r border-white/15 group-hover:border-g transition-colors" />
+                      <div className="absolute bottom-0 left-0 w-1.5 h-1.5 border-b border-l border-white/15 group-hover:border-g transition-colors" />
+                      
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 bg-white/5 border border-white/10 group-hover:bg-g/10 group-hover:border-g/20 transition-all rounded-sm">
+                          <IconComp className={`w-4 h-4 ${ut.color}`} />
+                        </div>
+                        <h4 className="font-display text-[11.5px] font-extrabold text-white uppercase tracking-[0.5px]">
+                          {t(ut.titlePl, ut.titleEn)}
+                        </h4>
                       </div>
-                      <h4 className="font-display text-[11.5px] font-extrabold text-white uppercase tracking-[0.5px]">
-                        {t(ut.titlePl, ut.titleEn)}
-                      </h4>
-                    </div>
 
-                    <p className="text-[10.5px] text-[#c8e6d2]/50 leading-relaxed group-hover:text-white/80 transition-colors">
-                      {t(ut.descPl, ut.descEn)}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
+                      <p className="text-[10.5px] text-[#c8e6d2]/50 leading-relaxed group-hover:text-white/80 transition-colors">
+                        {t(ut.descPl, ut.descEn)}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollReveal>
           </motion.div>
         )}
 

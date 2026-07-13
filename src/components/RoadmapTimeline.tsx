@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, Circle, Clock, Flame, Play, AlertCircle, Cpu, Network, Database, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import SlicedAsset, { SlicedAssetKey } from './SlicedAsset';
+import ScrollReveal from './ScrollReveal';
 
 type StatusType = 'completed' | 'active' | 'planned';
 
@@ -214,54 +215,58 @@ export default function RoadmapTimeline() {
       <div className="absolute bottom-0 right-0 w-24 h-[1px] bg-gradient-to-l from-g to-transparent" />
 
       {/* Title */}
-      <div className="text-center mb-16 select-none">
-        <div className="flex items-center justify-center gap-2 text-[10px] tracking-[5px] text-g/50 uppercase mb-4">
-          <span className="w-6 h-[1px] bg-g shadow-[0_0_6px_#00ff88]" />
-          {t('DOKĄD ZMIERZAMY', 'WHERE WE ARE HEADING')}
+      <ScrollReveal direction="up" delay={0} duration={900}>
+        <div className="text-center mb-16 select-none">
+          <div className="flex items-center justify-center gap-2 text-[10px] tracking-[5px] text-g/50 uppercase mb-4">
+            <span className="w-6 h-[1px] bg-g shadow-[0_0_6px_#00ff88]" />
+            {t('DOKĄD ZMIERZAMY', 'WHERE WE ARE HEADING')}
+          </div>
+          <h2 className="font-display text-3xl sm:text-5xl tracking-[2px] text-white uppercase">
+            {t('HARMONOGRAM ROZWOJU - ', 'DEVELOPMENT ROADMAP - ')}
+            <span className="text-g text-shadow-[0_0_8px_rgba(0,255,136,0.4)]">MISSION DIRECTORY</span>
+          </h2>
+          <p className="text-xs sm:text-sm text-[#c8e6d2]/50 max-w-[620px] mx-auto mt-4 leading-relaxed">
+            {t(
+              'Zrealizuj kosmiczny plan podróży dla ekosystemu Solaxy. Przeglądaj fazy rozwoju sieci, uruchamiaj diagnostykę modułów satelitarnych w czasie rzeczywistym i śledź nasze kroki ku dominacji SVM.',
+              'Track the interstellar trajectory for the Solaxy ecosystem. Explore live network integration phases, launch real-time satellite module diagnostics, and follow our steps towards SVM dominance.'
+            )}
+          </p>
         </div>
-        <h2 className="font-display text-3xl sm:text-5xl tracking-[2px] text-white uppercase">
-          {t('HARMONOGRAM ROZWOJU - ', 'DEVELOPMENT ROADMAP - ')}
-          <span className="text-g text-shadow-[0_0_8px_rgba(0,255,136,0.4)]">MISSION DIRECTORY</span>
-        </h2>
-        <p className="text-xs sm:text-sm text-[#c8e6d2]/50 max-w-[620px] mx-auto mt-4 leading-relaxed">
-          {t(
-            'Zrealizuj kosmiczny plan podróży dla ekosystemu Solaxy. Przeglądaj fazy rozwoju sieci, uruchamiaj diagnostykę modułów satelitarnych w czasie rzeczywistym i śledź nasze kroki ku dominacji SVM.',
-            'Track the interstellar trajectory for the Solaxy ecosystem. Explore live network integration phases, launch real-time satellite module diagnostics, and follow our steps towards SVM dominance.'
-          )}
-        </p>
-      </div>
+      </ScrollReveal>
 
       {/* Tabs Filter Bar */}
-      <div className="flex justify-center gap-2 mb-12 select-none overflow-x-auto pb-2 scrollbar-none">
-        {[
-          { key: 'all', labelPl: 'WSZYSTKIE FAZY', labelEn: 'ALL PHASES' },
-          { key: 'completed', labelPl: 'UKOŃCZONE', labelEn: 'COMPLETED' },
-          { key: 'active', labelPl: 'AKTYWNE', labelEn: 'ACTIVE' },
-          { key: 'planned', labelPl: 'PLANOWANE', labelEn: 'PLANNED' }
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => {
-              setActiveFilter(tab.key as any);
-              setExpandedPhaseId(null); // collapse to prevent layout jump on filter
-            }}
-            className={`relative px-4 py-2 text-[10px] tracking-[2px] uppercase font-mono font-bold border transition-all duration-300 cursor-pointer rounded whitespace-nowrap ${
-              activeFilter === tab.key
-                ? 'bg-g/10 border-g text-g shadow-[0_0_12px_rgba(0,255,136,0.15)]'
-                : 'bg-[#04080f]/40 border-white/5 text-white/50 hover:text-white hover:border-white/20'
-            }`}
-          >
-            {t(tab.labelPl, tab.labelEn)}
-            {activeFilter === tab.key && (
-              <motion.span
-                layoutId="activeFilterGlow"
-                className="absolute inset-0 border border-g rounded"
-                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              />
-            )}
-          </button>
-        ))}
-      </div>
+      <ScrollReveal direction="up" delay={150} duration={800}>
+        <div className="flex justify-center gap-2 mb-12 select-none overflow-x-auto pb-2 scrollbar-none">
+          {[
+            { key: 'all', labelPl: 'WSZYSTKIE FAZY', labelEn: 'ALL PHASES' },
+            { key: 'completed', labelPl: 'UKOŃCZONE', labelEn: 'COMPLETED' },
+            { key: 'active', labelPl: 'AKTYWNE', labelEn: 'ACTIVE' },
+            { key: 'planned', labelPl: 'PLANOWANE', labelEn: 'PLANNED' }
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => {
+                setActiveFilter(tab.key as any);
+                setExpandedPhaseId(null); // collapse to prevent layout jump on filter
+              }}
+              className={`relative px-4 py-2 text-[10px] tracking-[2px] uppercase font-mono font-bold border transition-all duration-300 cursor-pointer rounded whitespace-nowrap ${
+                activeFilter === tab.key
+                  ? 'bg-g/10 border-g text-g shadow-[0_0_12px_rgba(0,255,136,0.15)]'
+                  : 'bg-[#04080f]/40 border-white/5 text-white/50 hover:text-white hover:border-white/20'
+              }`}
+            >
+              {t(tab.labelPl, tab.labelEn)}
+              {activeFilter === tab.key && (
+                <motion.span
+                  layoutId="activeFilterGlow"
+                  className="absolute inset-0 border border-g rounded"
+                  transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </ScrollReveal>
 
       {/* Main Roadmap Timeline Layout */}
       <div className="relative">
@@ -326,13 +331,14 @@ export default function RoadmapTimeline() {
 
                   {/* Actual Roadmap Card */}
                   <div className="w-full sm:w-1/2">
-                    <div
-                      className={`border bg-[#04080f]/75 p-5 sm:p-6 transition-all duration-300 relative rounded-lg overflow-hidden group/card ${
-                        isExpanded
-                          ? `border-${phase.accentColor}/40 bg-[#000a06]/95 shadow-[0_0_20px_rgba(0,255,136,0.04)]`
-                          : `border-white/5 hover:bg-white/[0.01] ${phase.themeColor}`
-                      }`}
-                    >
+                    <ScrollReveal direction={isEven ? 'left' : 'right'} delay={idx * 80} duration={850}>
+                      <div
+                        className={`border bg-[#04080f]/75 p-5 sm:p-6 transition-all duration-300 relative rounded-lg overflow-hidden group/card ${
+                          isExpanded
+                            ? `border-${phase.accentColor}/40 bg-[#000a06]/95 shadow-[0_0_20px_rgba(0,255,136,0.04)]`
+                            : `border-white/5 hover:bg-white/[0.01] ${phase.themeColor}`
+                        }`}
+                      >
                       {/* Interactive click area to expand details */}
                       <div
                         onClick={() => togglePhaseExpand(phase.id)}
@@ -504,7 +510,8 @@ export default function RoadmapTimeline() {
                           </motion.div>
                         )}
                       </AnimatePresence>
-                    </div>
+                      </div>
+                    </ScrollReveal>
                   </div>
                 </motion.div>
               );
