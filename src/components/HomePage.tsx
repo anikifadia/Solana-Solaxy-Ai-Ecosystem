@@ -136,17 +136,17 @@ export default function HomePage({
           </div>
 
           {/* Paragraph and slogan points */}
-          <div className="max-w-[580px] mx-auto">
+          <div className="max-w-[620px] mx-auto">
             <p className="text-sm sm:text-base text-white/90 leading-relaxed font-bold mb-4">
               {t(
-                'Zaawansowany agregator płynności nowej generacji i ultra-szybki silnik transakcyjny na Solana SVM.',
-                'Zaawansowany agregator płynności nowej generacji i ultra-szybki silnik transakcyjny na Solana SVM.'
+                'Solaxy to pierwsza na świecie w pełni automatyczna fabryka tokenów dla twórców Web3, która pozwala w 10 sekund wygenerować, automatycznie zweryfikować audytem AI i wdrożyć na blockchain Solana gotowy token z zablokowaną płynnością – eliminując wysokie koszty programistyczne oraz ryzyko luk w smart kontraktach.',
+                'Solaxy is the world’s first fully automated token factory for Web3 creators, enabling you to generate, automatically verify with AI audit, and instantly deploy a complete Solana token with locked liquidity pools in 10 seconds—eliminating expensive development costs and smart contract security risks.'
               )}
             </p>
             <p className="text-xs sm:text-sm text-g font-semibold leading-relaxed">
               {t(
-                '$SLX to nie tylko token - to protokół nowej ery. Zabezpieczony smart contract · zero custody ·',
-                '$SLX to nie tylko token - to protokół nowej ery. Zabezpieczony smart contract · zero custody ·'
+                'Zero kodowania · 100% On-Chain · Wbudowana ochrona przed dumpingiem zespołu i ochrona Rugpull',
+                'Zero Coding Required · 100% On-Chain · Built-in Anti-Dump & Anti-Rugpull Safeguards'
               )}
             </p>
           </div>

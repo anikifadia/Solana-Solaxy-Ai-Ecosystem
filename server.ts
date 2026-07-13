@@ -51,6 +51,26 @@ async function startServer() {
   // 6. Mount API routers
   app.use("/api", apiRouter);
 
+  // SEO & Verification files served dynamically
+  app.get("/robots.txt", (req, res) => {
+    res.type("text/plain");
+    res.send(`User-agent: *
+Allow: /
+Sitemap: ${req.protocol}://${req.get("host")}/sitemap.xml`);
+  });
+
+  app.get("/sitemap.xml", (req, res) => {
+    res.type("application/xml");
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${req.protocol}://${req.get("host")}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`);
+  });
+
   // 7. Mount Vite middleware for dev HMR or static file server in production
   const isProd = process.env.NODE_ENV === "production";
   if (!isProd) {

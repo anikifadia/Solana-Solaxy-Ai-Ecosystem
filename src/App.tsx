@@ -21,6 +21,7 @@ import PresalePage from './components/PresalePage';
 import SwapPage from './components/SwapPage';
 import NetworkPage from './components/NetworkPage';
 import ForgePage from './components/ForgePage';
+import StatusPage from './components/StatusPage';
 
 // Live Ticker items structure
 interface TickerItem {
@@ -50,7 +51,7 @@ export default function App() {
   const [tickerData, setTickerData] = useState<TickerItem[]>(INITIAL_TICKER_DATA);
   const [solPrice, setSolPrice] = useState<number>(182.74);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'home' | 'generator' | 'presale' | 'swap' | 'network' | 'forge'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'generator' | 'presale' | 'swap' | 'network' | 'forge' | 'status'>('home');
 
   // Theme Customizer State
   const [theme, setTheme] = useState<'deep-black' | 'midnight-blue'>(() => {
@@ -597,6 +598,14 @@ export default function App() {
               {t('KUŹNIA & STAKING', 'FORGE & EARN')}
             </button>
           </li>
+          <li>
+            <button 
+              onClick={() => { setCurrentPage('status'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+              className={`text-[10px] tracking-[2px] transition-all bg-transparent border-none cursor-pointer p-0 font-mono uppercase ${currentPage === 'status' ? 'text-g text-shadow-[0_0_8px_#00ff88] font-extrabold' : 'text-white/45 hover:text-white'}`}
+            >
+              {t('STATUS & O NAS', 'STATUS & ABOUT')}
+            </button>
+          </li>
         </ul>
 
         <div className="flex items-center gap-3 md:gap-4">
@@ -712,14 +721,23 @@ export default function App() {
                 </button>
               </li>
               <li>
-                <button 
-                  onClick={() => { setCurrentPage('forge'); setIsMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  className={`w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 border-b border-white/5 bg-transparent border-none cursor-pointer text-left font-mono ${currentPage === 'forge' ? 'text-g text-shadow-[0_0_6px_rgba(0,255,136,0.35)]' : 'text-white/60 hover:text-white'}`}
-                >
-                  <span>{t('KUŹNIA & STAKING', 'FORGE & EARN')}</span>
-                  <span className="text-[12px]">➔</span>
-                </button>
-              </li>
+                  <button 
+                    onClick={() => { setCurrentPage('forge'); setIsMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className={`w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 border-b border-white/5 bg-transparent border-none cursor-pointer text-left font-mono ${currentPage === 'forge' ? 'text-g text-shadow-[0_0_6px_rgba(0,255,136,0.35)]' : 'text-white/60 hover:text-white'}`}
+                  >
+                    <span>{t('KUŹNIA & STAKING', 'FORGE & EARN')}</span>
+                    <span className="text-[12px]">➔</span>
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => { setCurrentPage('status'); setIsMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className={`w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 border-b border-white/5 bg-transparent border-none cursor-pointer text-left font-mono ${currentPage === 'status' ? 'text-g text-shadow-[0_0_6px_rgba(0,255,136,0.35)]' : 'text-white/60 hover:text-white'}`}
+                  >
+                    <span>{t('STATUS & O NAS', 'STATUS & ABOUT')}</span>
+                    <span className="text-[12px]">➔</span>
+                  </button>
+                </li>
               <li>
                 <button 
                   onClick={() => { setIsWalletModalOpen(true); setIsMobileMenuOpen(false); }}
@@ -864,6 +882,18 @@ export default function App() {
             <ForgePage t={t} />
           </motion.div>
         )}
+
+        {currentPage === 'status' && (
+          <motion.div
+            key="status"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25 }}
+          >
+            <StatusPage t={t} />
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* ══ FOOTER ══ */}
@@ -876,17 +906,26 @@ export default function App() {
           © 2026 SOLAX PROTOCOL · {t('WSZELKIE PRAWA ZASTRZEŻONE', 'ALL RIGHTS RESERVED')}
         </div>
 
-        <div className="flex gap-6">
-          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
-            DOCS
-          </a>
-          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
+        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
+          <button 
+            onClick={() => { setCurrentPage('status'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono bg-transparent border-none cursor-pointer transition-colors uppercase"
+          >
+            {t('STATUS SIECI', 'SYSTEM STATUS')}
+          </button>
+          <button 
+            onClick={() => { setCurrentPage('status'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono bg-transparent border-none cursor-pointer transition-colors uppercase"
+          >
+            {t('O NAS & KONTAKT', 'ABOUT & CONTACT')}
+          </button>
+          <a href="https://github.com/solaxy-protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
             GITHUB
           </a>
-          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
+          <a href="https://x.com/solaxy_protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
             X / TWITTER
           </a>
-          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
+          <a href="https://t.me/solaxy_protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
             TELEGRAM
           </a>
         </div>
