@@ -26,6 +26,7 @@ interface SwapPageProps {
   setTradeError: (msg: string | null) => void;
   isTrading: boolean;
   handleExecuteTrade: (ticker: string) => void;
+  walletBalances?: Record<string, number>;
 }
 
 export default function SwapPage({
@@ -44,6 +45,7 @@ export default function SwapPage({
   setTradeError,
   isTrading,
   handleExecuteTrade,
+  walletBalances = {},
 }: SwapPageProps) {
   return (
     <div className="pt-[110px]">
@@ -129,7 +131,7 @@ export default function SwapPage({
                       <div className="text-left sm:text-right">
                         <div className="text-[10px] text-white/30 uppercase tracking-[1px]">{t('Cena rynkowa:', 'Market price:')}</div>
                         <div className="font-mono text-xs text-white font-bold mt-0.5">
-                          {(tok.priceSol * solPrice).toFixed(4)} USD <span className="text-g">/ {tok.priceSol.toFixed(6)} SOL</span>
+                          {(tok.priceSol * solPrice).toFixed(4)} USD <span className="text-g">/ {(tok.priceSol * 6666.67).toFixed(2)} $SLX</span>
                         </div>
                       </div>
 
@@ -212,17 +214,48 @@ export default function SwapPage({
 
                   {/* Input Form */}
                   <div>
-                    <label className="block text-[10px] text-white/40 uppercase tracking-[1px] mb-1.5">{t('Wpłać Ilość SOL:', 'Pay SOL Amount:')}</label>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-[10px] text-white/40 uppercase tracking-[1px]">
+                        {tradeType === 'BUY' 
+                          ? t('Wpłać Ilość $SLX:', 'Pay $SLX Amount:') 
+                          : t(`Wpłać Ilość ${selectedTokenForTrade.ticker}:`, `Pay ${selectedTokenForTrade.ticker} Amount:`)
+                        }
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] text-g font-bold font-mono">
+                          {t('Saldo: ', 'Balance: ')}
+                          {tradeType === 'BUY' 
+                            ? `${(walletBalances['$SLX'] || 0).toLocaleString(undefined, {maximumFractionDigits: 2})} $SLX`
+                            : `${(walletBalances[selectedTokenForTrade.ticker.toUpperCase()] || 0).toLocaleString(undefined, {maximumFractionDigits: 2})} ${selectedTokenForTrade.ticker}`
+                          }
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const maxAmt = tradeType === 'BUY' 
+                              ? (walletBalances['$SLX'] || 0)
+                              : (walletBalances[selectedTokenForTrade.ticker.toUpperCase()] || 0);
+                            setTradeAmount(maxAmt.toString());
+                          }}
+                          className="text-[9px] text-cyan hover:text-white bg-cyan/10 hover:bg-cyan/20 border border-cyan/30 px-1.5 py-0.5 font-mono cursor-pointer transition-colors"
+                        >
+                          {t('Maks.', 'Max')}
+                        </button>
+                      </div>
+                    </div>
                     <div className="relative">
                       <input
                         type="number"
-                        step="0.1"
-                        min="0.01"
+                        step="10"
+                        min="1"
                         value={tradeAmount}
                         onChange={(e) => setTradeAmount(e.target.value)}
                         className="w-full bg-[#04080f]/90 border border-cyan/20 px-4 py-3 text-xs font-mono text-white focus:outline-none focus:border-cyan transition-colors"
+                        placeholder="0.00"
                       />
-                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono text-cyan font-bold">SOL</span>
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-mono text-cyan font-bold">
+                        {tradeType === 'BUY' ? '$SLX' : selectedTokenForTrade.ticker}
+                      </span>
                     </div>
                   </div>
 
@@ -237,15 +270,22 @@ export default function SwapPage({
                         {(() => {
                           const amt = parseFloat(tradeAmount);
                           if (isNaN(amt) || amt <= 0) return '0.00';
-                          return (amt / selectedTokenForTrade.priceSol).toLocaleString(undefined, {maximumFractionDigits: 4});
-                        })()}{' '}
-                        {selectedTokenForTrade.ticker}
+                          const priceSlx = selectedTokenForTrade.priceSol * 6666.67;
+                          if (tradeType === 'BUY') {
+                            const payout = amt / priceSlx;
+                            return `${payout.toLocaleString(undefined, {maximumFractionDigits: 2})} ${selectedTokenForTrade.ticker}`;
+                          } else {
+                            const payout = amt * priceSlx;
+                            return `${payout.toLocaleString(undefined, {maximumFractionDigits: 2})} $SLX`;
+                          }
+                        })()}
                       </span>
                       <span className="font-mono text-[10px] text-yellow-400">
                         {(() => {
                           const amt = parseFloat(tradeAmount);
                           if (isNaN(amt) || amt <= 0) return '0.00%';
-                          const tokAmt = amt / selectedTokenForTrade.priceSol;
+                          const priceSlx = selectedTokenForTrade.priceSol * 6666.67;
+                          const tokAmt = tradeType === 'BUY' ? (amt / priceSlx) : amt;
                           const impact = (tokAmt / selectedTokenForTrade.initialPool) * 100;
                           return `${impact.toFixed(3)}%`;
                         })()}
@@ -278,7 +318,7 @@ export default function SwapPage({
                         {t('PRZETWARZANIE SWAP...', 'PROCESSING SWAP...')}
                       </>
                     ) : (
-                      t('ZATWIERDŹ SWAP (SOLANA)', 'CONFIRM SWAP (SOLANA)')
+                      t('ZATWIERDŹ SWAP ($SLX)', 'CONFIRM SWAP ($SLX)')
                     )}
                   </button>
                 </div>

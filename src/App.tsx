@@ -83,6 +83,7 @@ export default function App() {
   const [tradeError, setTradeError] = useState<string | null>(null);
   const [tradeSuccess, setTradeSuccess] = useState<string | null>(null);
   const [isTrading, setIsTrading] = useState<boolean>(false);
+  const [walletBalances, setWalletBalances] = useState<Record<string, number>>({});
   const [expandedMetric, setExpandedMetric] = useState<string | null>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -156,29 +157,48 @@ export default function App() {
     return '$' + p.toLocaleString('en-US', { maximumFractionDigits: 0 });
   };
 
-  // 1. Live price simulator (low frequency interval to avoid blocking rendering)
+  // 1. Live price fetcher and simulator
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTickerData((prev) => 
-        prev.map((item) => {
-          const delta = (Math.random() - 0.495) * 0.0025; // slight positive bias
-          const newPrice = item.p * (1 + delta);
-          const newChange = item.c + (Math.random() - 0.5) * 0.12;
-          
-          if (item.n === 'SOL') {
-            setSolPrice(newPrice);
+    const fetchRealPrices = async () => {
+      try {
+        const res = await fetch('/api/market/prices');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.length) {
+            setTickerData((prev) => {
+              const newData = [...prev];
+              data.forEach((item: any) => {
+                let symbol = '';
+                if (item.symbol === 'SOLUSDT') symbol = 'SOL';
+                if (item.symbol === 'BTCUSDT') symbol = 'BTC';
+                if (item.symbol === 'ETHUSDT') symbol = 'ETH';
+                
+                if (symbol) {
+                  const idx = newData.findIndex(t => t.n === symbol);
+                  if (idx !== -1) {
+                    newData[idx].p = parseFloat(item.lastPrice);
+                    newData[idx].c = parseFloat(item.priceChangePercent);
+                  }
+                }
+                
+                if (item.symbol === 'SOLUSDT') {
+                  setSolPrice(parseFloat(item.lastPrice));
+                }
+              });
+              return newData;
+            });
           }
+        }
+      } catch (e) {}
+    };
 
-          return {
-            ...item,
-            p: newPrice,
-            c: newChange,
-          };
-        })
-      );
-      // Fluctuate Solana TPS dynamically
+    fetchRealPrices(); // Initial fetch
+    
+    // Refresh prices and fluctuate TPS dynamically
+    const interval = setInterval(() => {
+      fetchRealPrices();
       setTps(Math.round(64200 + Math.random() * 1400));
-    }, 3200);
+    }, 15000);
 
     return () => clearInterval(interval);
   }, []);
@@ -300,16 +320,84 @@ export default function App() {
     };
   }, []);
 
+  const reloadBalances = () => {
+    if (isConnected && walletAddress) {
+      const key = `solaxy_wallet_balances_${walletAddress}`;
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        try {
+          setWalletBalances(JSON.parse(saved));
+        } catch (e) {
+          console.error("Failed to parse balances:", e);
+        }
+      } else {
+        const initialBalances: Record<string, number> = {
+          '$SLX': 5000,
+        };
+        setWalletBalances(initialBalances);
+        localStorage.setItem(key, JSON.stringify(initialBalances));
+      }
+    } else {
+      setWalletBalances({});
+    }
+  };
+
+  useEffect(() => {
+    reloadBalances();
+    
+    const handleUpdate = () => {
+      reloadBalances();
+    };
+    
+    window.addEventListener('storage', handleUpdate);
+    window.addEventListener('solaxy-balance-updated', handleUpdate);
+    return () => {
+      window.removeEventListener('storage', handleUpdate);
+      window.removeEventListener('solaxy-balance-updated', handleUpdate);
+    };
+  }, [isConnected, walletAddress]);
+
   const handleExecuteTrade = async (ticker: string) => {
     setTradeError(null);
     setTradeSuccess(null);
     setIsTrading(true);
 
-    const solAmount = parseFloat(tradeAmount);
-    if (isNaN(solAmount) || solAmount <= 0) {
-      setTradeError(language === 'pl' ? 'Podaj prawidłową ilość SOL!' : 'Enter a valid SOL amount!');
+    if (!isConnected || !walletAddress) {
+      setTradeError(language === 'pl' ? 'Najpierw połącz swój portfel w prawym górnym rogu!' : 'Connect your wallet in the top-right first!');
       setIsTrading(false);
       return;
+    }
+
+    const enteredAmount = parseFloat(tradeAmount);
+    if (isNaN(enteredAmount) || enteredAmount <= 0) {
+      setTradeError(language === 'pl' ? 'Podaj prawidłową ilość!' : 'Enter a valid amount!');
+      setIsTrading(false);
+      return;
+    }
+
+    // Balance checks before submitting
+    const key = `solaxy_wallet_balances_${walletAddress}`;
+    if (tradeType === 'BUY') {
+      const userSlxBalance = walletBalances['$SLX'] || 0;
+      if (userSlxBalance < enteredAmount) {
+        setTradeError(language === 'pl' 
+          ? `Niewystarczające saldo $SLX w portfelu! Posiadasz tylko ${userSlxBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} $SLX. Dokonaj zakupu w przedsprzedaży, aby zdobyć więcej $SLX.` 
+          : `Insufficient $SLX balance in wallet! You only have ${userSlxBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} $SLX. Purchase in presale to acquire more $SLX.`
+        );
+        setIsTrading(false);
+        return;
+      }
+    } else {
+      const tokenTicker = ticker.toUpperCase();
+      const userTokenBalance = walletBalances[tokenTicker] || 0;
+      if (userTokenBalance < enteredAmount) {
+        setTradeError(language === 'pl' 
+          ? `Niewystarczające saldo ${ticker} w portfelu! Posiadasz tylko ${userTokenBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${ticker}.` 
+          : `Insufficient ${ticker} balance in wallet! You only have ${userTokenBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${ticker}.`
+        );
+        setIsTrading(false);
+        return;
+      }
     }
 
     try {
@@ -319,7 +407,8 @@ export default function App() {
         body: JSON.stringify({
           ticker,
           type: tradeType,
-          amountSol: solAmount
+          amount: enteredAmount,
+          user: walletAddress
         })
       });
 
@@ -328,6 +417,19 @@ export default function App() {
       if (!response.ok) {
         throw new Error(data.error || (language === 'pl' ? 'Błąd podczas realizacji transakcji.' : 'Error executing trade.'));
       }
+
+      // Update local wallet balances on success
+      const updatedBals = { ...walletBalances };
+      if (tradeType === 'BUY') {
+        updatedBals['$SLX'] = (updatedBals['$SLX'] || 0) - enteredAmount;
+        updatedBals[ticker.toUpperCase()] = (updatedBals[ticker.toUpperCase()] || 0) + data.tokenAmount;
+      } else {
+        updatedBals[ticker.toUpperCase()] = (updatedBals[ticker.toUpperCase()] || 0) - enteredAmount;
+        updatedBals['$SLX'] = (updatedBals['$SLX'] || 0) + (data.slxValue || 0);
+      }
+      setWalletBalances(updatedBals);
+      localStorage.setItem(key, JSON.stringify(updatedBals));
+      window.dispatchEvent(new Event('solaxy-balance-updated'));
 
       setTradeSuccess(
         language === 'pl' 
@@ -855,6 +957,7 @@ export default function App() {
               setTradeError={setTradeError}
               isTrading={isTrading}
               handleExecuteTrade={handleExecuteTrade}
+              walletBalances={walletBalances}
             />
           </motion.div>
         )}

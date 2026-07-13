@@ -290,6 +290,21 @@ export const PresaleSection: React.FC = () => {
           throw new Error(data.error || "Wystąpił błąd podczas symulacji.");
         }
 
+        // Update local wallet balances
+        if (userAddress) {
+          const key = `solaxy_wallet_balances_${userAddress}`;
+          const saved = localStorage.getItem(key);
+          let currentBals: Record<string, number> = { '$SLX': 5000 };
+          if (saved) {
+            try {
+              currentBals = JSON.parse(saved);
+            } catch (e) {}
+          }
+          currentBals['$SLX'] = (currentBals['$SLX'] || 0) + tokensReceived;
+          localStorage.setItem(key, JSON.stringify(currentBals));
+          window.dispatchEvent(new Event('solaxy-balance-updated'));
+        }
+
         setSuccessMsg(
           t(
             `Zakup udany (TRYB DEMO)! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja została odnotowana w bazie.`,
@@ -347,6 +362,21 @@ export const PresaleSection: React.FC = () => {
           throw new Error(data.error || t("Weryfikacja na blockchainie nie powiodła się. Sprawdź status za chwilę.", "Blockchain verification failed. Check status again shortly."));
         }
 
+        // Update local wallet balances
+        if (userAddress) {
+          const key = `solaxy_wallet_balances_${userAddress}`;
+          const saved = localStorage.getItem(key);
+          let currentBals: Record<string, number> = { '$SLX': 5000 };
+          if (saved) {
+            try {
+              currentBals = JSON.parse(saved);
+            } catch (e) {}
+          }
+          currentBals['$SLX'] = (currentBals['$SLX'] || 0) + tokensReceived;
+          localStorage.setItem(key, JSON.stringify(currentBals));
+          window.dispatchEvent(new Event('solaxy-balance-updated'));
+        }
+
         setSuccessMsg(
           t(
             `Zakup udany! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja o podpisie ${signature.substring(0, 8)}... została potwierdzona na Solana.`,
@@ -391,6 +421,20 @@ export const PresaleSection: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.error || t("Nie znaleziono transakcji o tym podpisie przesyłającej SOL do nas.", "No transaction with this signature transferring SOL to us was found."));
       }
+
+      // Update local wallet balances
+      const targetAddr = userAddress || 'ManualBuyer...Wallet';
+      const key = `solaxy_wallet_balances_${targetAddr}`;
+      const saved = localStorage.getItem(key);
+      let currentBals: Record<string, number> = { '$SLX': 5000 };
+      if (saved) {
+        try {
+          currentBals = JSON.parse(saved);
+        } catch (e) {}
+      }
+      currentBals['$SLX'] = (currentBals['$SLX'] || 0) + data.contribution.amountSlx;
+      localStorage.setItem(key, JSON.stringify(currentBals));
+      window.dispatchEvent(new Event('solaxy-balance-updated'));
 
       setSuccessMsg(t(
         `Transakcja pomyślnie zweryfikowana! Przypisano ${data.contribution.amountSlx.toLocaleString()} $SLX do Twojego konta.`,

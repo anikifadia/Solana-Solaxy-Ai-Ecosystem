@@ -23,6 +23,27 @@ const generateTokenSchema = z.object({
   })
 });
 
+// Market Prices Fetcher Cache
+let cachedMarketPrices: any = null;
+let marketPricesLastFetched = 0;
+
+router.get("/market/prices", async (req, res) => {
+  const now = Date.now();
+  if (cachedMarketPrices && now - marketPricesLastFetched < 60000) {
+    return res.json(cachedMarketPrices); // return cached
+  }
+  try {
+    const response = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["SOLUSDT","BTCUSDT","ETHUSDT"]');
+    const data = await response.json();
+    cachedMarketPrices = data;
+    marketPricesLastFetched = now;
+    res.json(data);
+  } catch (err) {
+    console.error("Error fetching binance data", err);
+    res.json(cachedMarketPrices || []);
+  }
+});
+
 const submitPresaleSchema = z.object({
   body: z.object({
     signature: z.string(),
@@ -49,7 +70,8 @@ const tradeTokenSchema = z.object({
   body: z.object({
     ticker: z.string(),
     type: z.enum(["BUY", "SELL"]),
-    amountSol: z.number().positive()
+    amount: z.number().positive(),
+    user: z.string().optional()
   })
 });
 
@@ -98,7 +120,16 @@ router.get("/mining/status", (req, res) => {
     return { ...m, isOnline };
   });
 
-  const solPrice = 182.74;
+  const now = Date.now();
+  let solPrice = 182.74; // Fallback
+  
+  if (cachedMarketPrices && Array.isArray(cachedMarketPrices)) {
+    const solData = cachedMarketPrices.find((item: any) => item.symbol === 'SOLUSDT');
+    if (solData) {
+      solPrice = parseFloat(solData.lastPrice);
+    }
+  }
+
   const totalMinedSol = Object.values(activeMiners).reduce((sum, m) => sum + (Number(m.balance) || 0), 0);
   
   const tvlUsd = 4700000000 + (tokens.length * 1500000) + (totalMinedSol * solPrice);
@@ -234,7 +265,7 @@ router.post("/tokens/deploy", validateRequest(deployTokenSchema), (req, res) => 
 
 // 5. Token AMM Trade Swap
 router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
-  const { ticker, type, amountSol } = req.body;
+  const { ticker, type, amount, user } = req.body;
 
   const token = tokens.find(t => t.ticker.toUpperCase() === ticker.toUpperCase());
   if (!token) {
@@ -242,9 +273,13 @@ router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
   }
 
   const currentPriceSol = token.priceSol || 0.0001;
-  const tokenAmount = amountSol / currentPriceSol;
+  const currentPriceSlx = currentPriceSol * 6666.67;
+  let tokenAmount = 0;
+  let slxValue = 0;
 
   if (type === "BUY") {
+    tokenAmount = amount / currentPriceSlx;
+    slxValue = amount;
     if ((token.remainingPool || 0) < tokenAmount) {
       return res.status(400).json({ 
         error: `Niewystarczająca płynność w puli! Pozostało tylko ${(token.remainingPool || 0).toLocaleString()} ${token.ticker}.` 
@@ -253,19 +288,25 @@ router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
     token.remainingPool = Math.floor((token.remainingPool || 0) - tokenAmount);
     token.priceSol = currentPriceSol * (1 + (tokenAmount / (token.initialPool || 1000000)) * 1.5);
   } else {
+    tokenAmount = amount;
+    slxValue = amount * currentPriceSlx;
     token.remainingPool = Math.floor((token.remainingPool || 0) + tokenAmount);
     token.priceSol = Math.max(0.000001, currentPriceSol * (1 - (tokenAmount / (token.initialPool || 1000000)) * 1.0));
   }
 
   saveTokens();
 
+  const formattedUser = user ? (user.substring(0, 4) + "..." + user.substring(user.length - 4)) : "AMM_KUPACZ";
+
   miningHistory.unshift({
     id: Math.random().toString(36).substring(2, 11),
-    username: "AMM_KUPACZ",
+    username: formattedUser,
     action: type === "BUY" ? "KUPNO" : "SPRZEDAŻ",
     amount: Number(tokenAmount.toFixed(4)),
     timestamp: new Date().toLocaleTimeString(),
-    details: `${token.ticker} za ${amountSol.toFixed(2)} SOL`
+    details: type === "BUY" 
+      ? `${token.ticker} za ${slxValue.toFixed(2)} $SLX`
+      : `${tokenAmount.toLocaleString(undefined, {maximumFractionDigits: 2})} ${token.ticker} za ${slxValue.toFixed(2)} $SLX`
   });
 
   if (miningHistory.length > 50) {
@@ -276,7 +317,8 @@ router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
     success: true, 
     remainingPool: token.remainingPool, 
     newPriceSol: token.priceSol,
-    tokenAmount
+    tokenAmount,
+    slxValue
   });
 });
 

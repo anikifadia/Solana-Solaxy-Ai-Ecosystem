@@ -460,6 +460,19 @@ export default function MiningStakingForge() {
         localStorage.setItem('solax_users', JSON.stringify(usersList));
       }
 
+      // Update global wallet balance for the target wallet
+      const walletKey = `solaxy_wallet_balances_${wallet}`;
+      const savedBals = localStorage.getItem(walletKey);
+      let currentBals: Record<string, number> = { '$SLX': 5000 };
+      if (savedBals) {
+        try {
+          currentBals = JSON.parse(savedBals);
+        } catch (e) {}
+      }
+      currentBals['$SLX'] = (currentBals['$SLX'] || 0) + amt;
+      localStorage.setItem(walletKey, JSON.stringify(currentBals));
+      window.dispatchEvent(new Event('solaxy-balance-updated'));
+
       setSavedSlx(data.newBalance);
       setWithdrawSuccess(true);
       setWithdrawAmountInput('');
@@ -1427,16 +1440,21 @@ export default function MiningStakingForge() {
             </div>
           </div>
 
-          <button 
-            onClick={() => setIsMining(!isMining)}
-            className={`w-full py-4 border font-bold tracking-[4px] uppercase text-xs transition-all duration-300 interactive-cursor mb-6 ${
-              isMining 
-                ? 'border-r text-r hover:bg-r/10 hover:shadow-[0_0_20px_rgba(255,26,74,0.3)]' 
-                : 'border-cyan text-cyan hover:bg-cyan/15 hover:shadow-[0_0_20px_rgba(0,238,255,0.3)]'
-            }`}
-          >
-            {isMining ? t('⚡ WYŁĄCZ DECYZJĘ WYDOBYCIA', '⚡ SHUTDOWN ASSET EXCAVATOR') : t('⚡ URUCHOM DECYZJĘ WYDOBYCIA', '⚡ LAUNCH ASSET EXCAVATOR')}
-          </button>
+          <div className="flex flex-col items-center gap-2 mb-6">
+            <button 
+              onClick={() => setIsMining(!isMining)}
+              className={`w-full py-4 border font-bold tracking-[4px] uppercase text-xs transition-all duration-300 interactive-cursor ${
+                isMining 
+                  ? 'border-r text-r hover:bg-r/10 hover:shadow-[0_0_20px_rgba(255,26,74,0.3)]' 
+                  : 'border-cyan text-cyan hover:bg-cyan/15 hover:shadow-[0_0_20px_rgba(0,238,255,0.3)]'
+              }`}
+            >
+              {isMining ? t('⚡ WYŁĄCZ DECYZJĘ WYDOBYCIA', '⚡ SHUTDOWN ASSET EXCAVATOR') : t('⚡ URUCHOM DECYZJĘ WYDOBYCIA', '⚡ LAUNCH ASSET EXCAVATOR')}
+            </button>
+            <span className="text-[10px] text-white/50 uppercase tracking-[1px] text-center">
+              {t('Uwaga: Wydobywanie odbywa się tylko w aktywnej karcie przeglądarki.', 'Note: Mining only occurs while this browser tab is active.')}
+            </span>
+          </div>
 
           {/* Real-time Mining Network Database & History section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
