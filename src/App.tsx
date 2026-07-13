@@ -125,6 +125,23 @@ export default function App() {
     };
   }, []);
 
+  // Listen for custom navigation events (e.g. from the admin panel to the DEX or Forge)
+  useEffect(() => {
+    const handleNavigation = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        setCurrentPage(customEvent.detail);
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 50);
+      }
+    };
+    window.addEventListener('solaxy-navigate', handleNavigation);
+    return () => {
+      window.removeEventListener('solaxy-navigate', handleNavigation);
+    };
+  }, []);
+
   // Custom cursor DOM refs
   const cursorDotRef = useRef<HTMLDivElement | null>(null);
   const cursorRingRef = useRef<HTMLDivElement | null>(null);

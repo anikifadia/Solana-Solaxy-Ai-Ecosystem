@@ -401,7 +401,12 @@ export default function TokenLifecyclePipeline({ activeStepIdx, isDeploying, tok
           return (
             <button
               key={step.id}
-              onClick={() => setSelectedStepIdx(idx)}
+              onClick={() => {
+                setSelectedStepIdx(idx);
+                if (step.id === 'governance') {
+                  window.dispatchEvent(new CustomEvent('solaxy-navigate', { detail: 'swap' }));
+                }
+              }}
               className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 border relative transition-all duration-300 select-none cursor-pointer text-left outline-none ${
                 isSelected 
                   ? 'border-g bg-g/5 text-white shadow-[0_0_12px_rgba(0,255,136,0.12)]' 
@@ -472,6 +477,29 @@ export default function TokenLifecyclePipeline({ activeStepIdx, isDeploying, tok
               <p className="text-xs text-white/70 leading-relaxed font-mono mt-3">
                 {language === 'pl' ? selectedStep.descPl : selectedStep.descEn}
               </p>
+
+              {selectedStep.id === 'governance' && (
+                <div className="mt-4 flex flex-wrap gap-3 animate-fadeIn">
+                  <button
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('solaxy-navigate', { detail: 'swap' }));
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-g to-cyan text-black font-extrabold text-xs uppercase tracking-[1.5px] border border-g hover:brightness-110 active:scale-95 transition-all duration-200 shadow-[0_0_15px_rgba(0,255,136,0.3)] flex items-center gap-2 rounded-sm cursor-pointer interactive-cursor"
+                  >
+                    <ArrowDownUp className="w-4 h-4 text-black" />
+                    {t('Przejdź do DEX Swap', 'Go to DEX Swap')}
+                  </button>
+                  <button
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent('solaxy-navigate', { detail: 'forge' }));
+                    }}
+                    className="px-4 py-2 bg-black/60 hover:bg-r/10 text-r font-extrabold text-xs uppercase tracking-[1.5px] border border-r/50 hover:border-r active:scale-95 transition-all duration-200 flex items-center gap-2 rounded-sm cursor-pointer interactive-cursor"
+                  >
+                    <Sliders className="w-4 h-4 text-r" />
+                    {t('Otwórz Kuźnię & Staking', 'Open Forge & Staking')}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="text-[8px] text-white/30 uppercase mt-4 border-t border-white/5 pt-2 flex items-center gap-1.5">
