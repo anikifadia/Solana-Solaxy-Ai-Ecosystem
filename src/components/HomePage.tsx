@@ -164,21 +164,16 @@ export default function HomePage({
             <span className="border border-r/30 bg-r/5 text-r px-3.5 py-1.5 rounded-sm">DOMINATE</span>
           </div>
 
-          {/* Centered Floating Mascot standing on moon */}
-          <div className="relative w-full max-w-[480px] aspect-[4/3] rounded-lg overflow-hidden border border-g/15 shadow-[0_0_35px_rgba(0,255,136,0.15)] bg-black/40 mb-10">
-            {/* Galaxy wormhole behind mascot */}
-            <div className="absolute inset-0 opacity-40 mix-blend-screen pointer-events-none z-0">
-              <Wormhole />
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center z-10 p-4">
-              <motion.div 
-                animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut" }}
-                className="w-[200px]"
-              >
-                <SlicedAsset asset="main-pose" className="w-full h-auto drop-shadow-[0_0_30px_rgba(0,255,136,0.3)]" />
-              </motion.div>
-            </div>
+          {/* Centered Beautiful Mascot standing on moon */}
+          <div className="w-full max-w-[540px] relative overflow-hidden rounded-lg border border-g/20 bg-[#02050a]/90 shadow-[0_0_45px_rgba(0,255,136,0.18)] mb-10 group">
+            {/* Ambient inner glow */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none z-10" />
+            <img 
+              src={HERO_IMAGE} 
+              alt="Solaxy Mascot Hero" 
+              className="w-full h-auto object-cover transform scale-100 group-hover:scale-[1.02] transition-transform duration-700"
+              referrerPolicy="no-referrer"
+            />
           </div>
 
           {/* Paragraph and slogan points */}

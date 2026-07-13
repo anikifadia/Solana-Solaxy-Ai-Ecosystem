@@ -1463,31 +1463,39 @@ export default function MiningStakingForge() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {serverMiners.map((m, idx) => (
-                      <tr key={idx} className={m.username === currentUser ? "text-cyan bg-cyan/5 font-bold" : "text-white/80"}>
-                        <td className="py-2 flex items-center gap-1.5 truncate max-w-[120px]">
-                          <User className="w-3 h-3 text-cyan/70" />
-                          <span className="truncate" title={m.username}>{m.username}</span>
-                          {m.username === currentUser && <span className="text-[8px] bg-cyan/20 px-1 py-0.5 rounded text-cyan shrink-0">{t('TY', 'YOU')}</span>}
-                        </td>
-                        <td className="py-2 text-right text-cyan/90">{m.isOnline ? `${m.hashRate} GH/s` : '0 GH/s'}</td>
-                        <td className="py-2 text-right font-bold">{m.balance.toFixed(4)}</td>
-                        <td className="py-2 text-right">
-                          <span 
-                            className={`inline-block w-1.5 h-1.5 rounded-full ${
-                              m.isOnline 
-                                ? (m.hashRate > 0 ? 'bg-g animate-pulse' : 'bg-yellow-500 animate-pulse') 
-                                : 'bg-white/20'
-                            }`} 
-                            title={
-                              m.isOnline 
-                                ? (m.hashRate > 0 ? t('Kopie', 'Mining') : t('Standby', 'Standby')) 
-                                : t('Offline', 'Offline')
-                            }
-                          />
+                    {serverMiners.length > 0 ? (
+                      serverMiners.map((m, idx) => (
+                        <tr key={idx} className={m.username === currentUser ? "text-cyan bg-cyan/5 font-bold" : "text-white/80"}>
+                          <td className="py-2 flex items-center gap-1.5 truncate max-w-[120px]">
+                            <User className="w-3 h-3 text-cyan/70" />
+                            <span className="truncate" title={m.username}>{m.username}</span>
+                            {m.username === currentUser && <span className="text-[8px] bg-cyan/20 px-1 py-0.5 rounded text-cyan shrink-0">{t('TY', 'YOU')}</span>}
+                          </td>
+                          <td className="py-2 text-right text-cyan/90">{m.isOnline ? `${m.hashRate} GH/s` : '0 GH/s'}</td>
+                          <td className="py-2 text-right font-bold">{m.balance.toFixed(4)}</td>
+                          <td className="py-2 text-right">
+                            <span 
+                              className={`inline-block w-1.5 h-1.5 rounded-full ${
+                                m.isOnline 
+                                  ? (m.hashRate > 0 ? 'bg-g animate-pulse' : 'bg-yellow-500 animate-pulse') 
+                                  : 'bg-white/20'
+                              }`} 
+                              title={
+                                m.isOnline 
+                                  ? (m.hashRate > 0 ? t('Kopie', 'Mining') : t('Standby', 'Standby')) 
+                                  : t('Offline', 'Offline')
+                              }
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="py-6 text-center text-white/30 italic">
+                          {t('Twój węzeł jest nieaktywny. Zarejestruj się / zaloguj po prawej stronie i uruchom kopalnię, aby aktywować swój węzeł.', 'Your node is inactive. Register or log in on the right and launch the miner to activate your node.')}
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1532,7 +1540,9 @@ export default function MiningStakingForge() {
                     );
                   })
                 ) : (
-                  <div className="text-xs text-white/30 italic text-center py-4 font-mono">{t('Brak wpisów w historii...', 'No history entries...')}</div>
+                  <div className="text-xs text-white/30 italic text-center py-4 font-mono">
+                    {t('Brak rzeczywistych transakcji w historii. Aktywuj kopalnię i dokonaj zapisu plonu, aby zobaczyć autentyczne dane.', 'No real transactions in history. Activate the miner and save your yield to see authentic data.')}
+                  </div>
                 )}
               </div>
             </div>

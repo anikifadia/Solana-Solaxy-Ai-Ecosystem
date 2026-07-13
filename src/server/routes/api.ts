@@ -93,7 +93,7 @@ router.post("/gemini/generate-token", validateRequest(generateTokenSchema), asyn
 // 2. Mining & DEX Dashboard Status
 router.get("/mining/status", (req, res) => {
   const minersList = Object.values(activeMiners).map(m => {
-    const isOnline = m.isOnline && (Date.now() - m.lastSeen < 60000 || ["CryptoJanusz", "GemHunterPL", "GigaKoparka_x1000"].includes(m.username));
+    const isOnline = m.isOnline && (Date.now() - m.lastSeen < 60000);
     return { ...m, isOnline };
   });
 
