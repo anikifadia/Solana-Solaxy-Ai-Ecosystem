@@ -1,0 +1,78 @@
+import { Request, Response, NextFunction } from "express";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import { ZodSchema, ZodError } from "zod";
+
+// 1. Core security headers with Helmet
+export const securityHeaders = helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'", "https://*"],
+      connectSrc: [
+        "'self'", 
+        "https://api.mainnet-beta.solana.com", 
+        "https://api.devnet.solana.com",
+        "https://generativelanguage.googleapis.com"
+      ],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "https://*"],
+      frameAncestors: ["*"], // Allow iframe embedding in the AI Studio environment
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+  frameguard: false, // Disable X-Frame-Options: SAMEORIGIN to allow preview within standard frames
+});
+
+// 2. Global API Rate Limiter
+export const apiRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // limit each IP to 300 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: "Zbyt wiele żądań z tego adresu IP. Spróbuj ponownie za 15 minut."
+  }
+});
+
+// 3. Centralized Request Validation Middleware using Zod
+export const validateRequest = (schema: ZodSchema) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await schema.parseAsync({
+        body: req.body,
+        query: req.query,
+        params: req.params,
+      });
+      return next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          error: "Błąd walidacji danych wejściowych.",
+          details: error.issues.map(err => `${err.path.join(".")}: ${err.message}`)
+        });
+      }
+      return next(error);
+    }
+  };
+};
+
+// 4. Centralized Error Handling Middleware
+export const errorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.error("[Central Server Error]:", err);
+
+  const statusCode = err.status || err.statusCode || 500;
+  const message = err.message || "Wystąpił nieoczekiwany błąd serwera.";
+
+  return res.status(statusCode).json({
+    error: message,
+    code: err.code || "INTERNAL_SERVER_ERROR",
+    ...(process.env.NODE_ENV !== "production" ? { stack: err.stack } : {})
+  });
+};

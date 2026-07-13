@@ -111,6 +111,20 @@ export default function App() {
     };
   }, []);
 
+  // Listen for custom start-ai-generation events from landing page prompter
+  useEffect(() => {
+    const handleStartRealGen = (e: Event) => {
+      setCurrentPage('generator');
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 50);
+    };
+    window.addEventListener('start-ai-generation', handleStartRealGen);
+    return () => {
+      window.removeEventListener('start-ai-generation', handleStartRealGen);
+    };
+  }, []);
+
   // Custom cursor DOM refs
   const cursorDotRef = useRef<HTMLDivElement | null>(null);
   const cursorRingRef = useRef<HTMLDivElement | null>(null);

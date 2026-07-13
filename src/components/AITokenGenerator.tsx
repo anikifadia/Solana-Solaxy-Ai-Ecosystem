@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { 
   Coins, Flame, Hammer, TrendingUp, Sparkles, Zap, ShieldCheck, 
   Cat, Globe, Rocket, Trophy, Heart, Crown, ArrowRight, Code, 
-  Copy, Terminal, Check, Loader2, Play, Info, CheckCircle2, Cpu, Activity
+  Copy, Terminal, Check, Loader2, Play, Info, CheckCircle2, Cpu, Activity,
+  Shield, RefreshCw
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
 import TokenLifecyclePipeline from './TokenLifecyclePipeline';
@@ -30,6 +31,10 @@ export default function AITokenGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<GeneratedToken | null>(null);
   
+  // Real-time AI Core Reactor progress state
+  const [genProgress, setGenProgress] = useState(0);
+  const [genPhase, setGenPhase] = useState<'analyzing' | 'synthesizing' | 'compiling' | 'auditing' | 'deployed'>('analyzing');
+
   // Interaction states for the generated token
   const [copied, setCopied] = useState(false);
   const [isCompiling, setIsCompiling] = useState(false);
@@ -39,6 +44,58 @@ export default function AITokenGenerator() {
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
   const [deployStepIndex, setDeployStepIndex] = useState<number>(-1);
   const [deployProgress, setDeployProgress] = useState<number>(0);
+
+  // Smooth reactor core progress simulator
+  React.useEffect(() => {
+    if (!isGenerating) {
+      setGenProgress(0);
+      setGenPhase('analyzing');
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setGenProgress(prev => {
+        const increment = Math.floor(Math.random() * 4) + 2; // steady progress
+        const next = prev + increment;
+        if (next >= 95) {
+          clearInterval(interval);
+          return 95;
+        }
+
+        // Divide 0-95 into progressive compiler steps
+        if (next < 25) {
+          setGenPhase('analyzing');
+        } else if (next < 50) {
+          setGenPhase('synthesizing');
+        } else if (next < 75) {
+          setGenPhase('compiling');
+        } else {
+          setGenPhase('auditing');
+        }
+
+        return next;
+      });
+    }, 180);
+
+    return () => clearInterval(interval);
+  }, [isGenerating]);
+
+  // Handle custom start-ai-generation events from other components (like landing page)
+  React.useEffect(() => {
+    const handleStartRealGen = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const targetPrompt = customEvent.detail?.prompt;
+      if (targetPrompt) {
+        setPrompt(targetPrompt);
+        handleGenerate(targetPrompt);
+      }
+    };
+
+    window.addEventListener('start-ai-generation', handleStartRealGen);
+    return () => {
+      window.removeEventListener('start-ai-generation', handleStartRealGen);
+    };
+  }, []);
 
   // Mascot trigger effect to auto-fill and auto-generate a meme token about dogs
   React.useEffect(() => {
@@ -84,6 +141,8 @@ export default function AITokenGenerator() {
     setCompileSuccess(false);
     setDeploySuccess(false);
     setTerminalLogs([]);
+    setGenProgress(0);
+    setGenPhase('analyzing');
 
     try {
       const response = await fetch('/api/gemini/generate-token', {
@@ -98,11 +157,15 @@ export default function AITokenGenerator() {
         throw new Error(data.error || t('Wystąpił błąd podczas komunikacji z serwerem AI.', 'An error occurred while communicating with the AI server.'));
       }
 
-      setToken(data);
+      setGenProgress(100);
+      setGenPhase('deployed');
+      setTimeout(() => {
+        setToken(data);
+        setIsGenerating(false);
+      }, 800);
     } catch (err: any) {
       console.error(err);
       setError(err.message || t('Nie udało się połączyć z API Gemini.', 'Failed to connect to the Gemini API.'));
-    } finally {
       setIsGenerating(false);
     }
   };
@@ -340,22 +403,130 @@ export default function AITokenGenerator() {
         </div>
       )}
 
-      {/* Generating State */}
+      {/* Generating State with AI Core Reactor Visualizer */}
       {isGenerating && (
-        <div className="py-12 flex flex-col items-center justify-center text-center animate-fadeIn font-mono">
-          <div className="relative mb-6">
-            <div className="w-16 h-16 border-2 border-g/20 rounded-full animate-spin border-t-g" />
-            <Sparkles className="w-6 h-6 text-g absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-          </div>
-          <div className="text-g font-bold text-sm tracking-[2px] uppercase mb-1.5">
-            {t('Sztuczna Inteligencja Gemini Forguje Kontrakt...', 'Gemini AI is Forging the Contract...')}
-          </div>
-          <p className="text-[11px] text-white/40 max-w-[420px] mb-4">
-            {t('Analizujemy tokenomię, projektujemy parametry emisji, mapujemy grafikę i generujemy bezpieczny kod w języku Rust.', 'We are analyzing tokenomics, designing emission parameters, mapping graphics, and generating secure Rust code.')}
-          </p>
-          
-          <div className="w-full max-w-md h-1 bg-white/5 relative overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-g to-cyan animate-[shimmer_2s_infinite_linear] w-2/3" />
+        <div className="py-8 flex flex-col items-center justify-center animate-fadeIn font-mono">
+          <div className="w-full max-w-[500px] border border-g/20 bg-[#04080f]/90 p-6 md:p-8 shadow-[0_0_50px_rgba(0,255,136,0.15)] rounded relative">
+            {/* HD corners */}
+            <span className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-g shadow-[0_0_8px_rgba(0,255,136,0.8)]" />
+            <span className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-g shadow-[0_0_8px_rgba(0,255,136,0.8)]" />
+            <span className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-g shadow-[0_0_8px_rgba(0,255,136,0.8)]" />
+            <span className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-g shadow-[0_0_8px_rgba(0,255,136,0.8)]" />
+
+            {/* Header info */}
+            <div className="flex justify-between items-center border-b border-g/10 pb-3 mb-6 text-[10px]">
+              <span className="text-g font-bold uppercase tracking-[2px] flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-g animate-ping" />
+                {t('REAKTOR SYNTEZY AI // AKTYWNY', 'AI SYNTHESIS REACTOR // ACTIVE')}
+              </span>
+              <span className="text-white/40 tracking-[1.5px] uppercase">
+                {t('OBROTY RDZENIA: MAKSYMALNE', 'CORE SPEED: MAXIMUM')}
+              </span>
+            </div>
+
+            {/* Reactor Center Graphic */}
+            <div className="relative aspect-square w-full max-w-[220px] mx-auto mb-8 flex items-center justify-center">
+              {/* Outer Rotating Energy Circles */}
+              <div className="absolute inset-0 rounded-full border border-dashed border-g/25 animate-[spin_8s_linear_infinite]" />
+              <div className="absolute inset-3 rounded-full border border-g/30 border-t-g border-b-cyan animate-[spin_3s_linear_infinite_reverse]" />
+              
+              <div className="absolute inset-6 rounded-full bg-radial-[ellipse_at_center] from-g/[0.05] to-transparent pointer-events-none" />
+
+              {/* Floating Node Signals */}
+              <div className="absolute inset-8 flex items-center justify-between pointer-events-none">
+                <span className="w-1 h-1 bg-g rounded-full animate-ping" />
+                <span className="w-1 h-1 bg-cyan rounded-full animate-ping" />
+              </div>
+
+              {/* Central Core Sphere */}
+              <div className="relative w-32 h-32 rounded-full bg-black/95 border border-g/40 flex flex-col items-center justify-center p-3 text-center overflow-hidden z-[2] shadow-[0_0_30px_rgba(0,255,136,0.2)]">
+                <div className="absolute inset-0 bg-g/5 rounded-full filter blur-lg animate-pulse" />
+
+                {genPhase === 'analyzing' && (
+                  <div className="z-10 flex flex-col items-center animate-fadeIn text-center">
+                    <RefreshCw className="w-8 h-8 text-cyan mb-1.5 animate-spin" />
+                    <div className="text-[8px] text-white/50 uppercase tracking-[1px]">{t('ETAP 1/4', 'STAGE 1/4')}</div>
+                    <div className="text-[9px] font-bold text-cyan uppercase tracking-[1px] mt-0.5">{t('ANALIZA POMYSŁU', 'ANALYZING PROMPT')}</div>
+                    <div className="text-xs text-g font-bold mt-1">{genProgress}%</div>
+                  </div>
+                )}
+
+                {genPhase === 'synthesizing' && (
+                  <div className="z-10 flex flex-col items-center animate-fadeIn text-center">
+                    <Sparkles className="w-8 h-8 text-purple-400 mb-1.5 animate-pulse" />
+                    <div className="text-[8px] text-white/50 uppercase tracking-[1px]">{t('ETAP 2/4', 'STAGE 2/4')}</div>
+                    <div className="text-[9px] font-bold text-purple-400 uppercase tracking-[1px] mt-0.5">{t('SYNTEZA METADANYCH', 'SYNTHESIZING TOKENS')}</div>
+                    <div className="text-xs text-g font-bold mt-1">{genProgress}%</div>
+                  </div>
+                )}
+
+                {genPhase === 'compiling' && (
+                  <div className="z-10 flex flex-col items-center animate-fadeIn text-center">
+                    <Terminal className="w-8 h-8 text-yellow-400 mb-1.5 animate-bounce" />
+                    <div className="text-[8px] text-white/50 uppercase tracking-[1px]">{t('ETAP 3/4', 'STAGE 3/4')}</div>
+                    <div className="text-[9px] font-bold text-yellow-400 uppercase tracking-[1px] mt-0.5">{t('KOMPILACJA RUST', 'COMPILING CONTRACT')}</div>
+                    <div className="text-xs text-g font-bold mt-1">{genProgress}%</div>
+                  </div>
+                )}
+
+                {genPhase === 'auditing' && (
+                  <div className="z-10 flex flex-col items-center animate-fadeIn text-center">
+                    <Shield className="w-8 h-8 text-red-500 mb-1.5 animate-pulse" />
+                    <div className="text-[8px] text-white/50 uppercase tracking-[1px]">{t('ETAP 4/4', 'STAGE 4/4')}</div>
+                    <div className="text-[9px] font-bold text-red-500 uppercase tracking-[1px] mt-0.5">{t('AUDYT SENTINEL', 'SHIELD AUDIT')}</div>
+                    <div className="text-xs text-g font-bold mt-1">{genProgress}%</div>
+                  </div>
+                )}
+
+                {genPhase === 'deployed' && (
+                  <div className="z-10 flex flex-col items-center animate-fadeIn text-center">
+                    <CheckCircle2 className="w-8 h-8 text-g mb-1.5 animate-[bounce_1s_infinite]" />
+                    <div className="text-[8px] text-white/50 uppercase tracking-[1px]">{t('SUKCES 4/4', 'SUCCESS 4/4')}</div>
+                    <div className="text-[9px] font-bold text-g uppercase tracking-[1px] mt-0.5">{t('GOTOWE DO EMISJI', 'FORGED SUCCESSFULLY')}</div>
+                    <div className="text-[7px] text-white/40 mt-1 uppercase">COMPLETED // SLX</div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Stepper progress bar with neon track */}
+            <div className="mb-5 bg-black/60 border border-white/5 p-3 rounded-sm">
+              <div className="flex justify-between items-center text-[9px] text-white/40 mb-1.5">
+                <span>{t('GŁÓWNY POZIOM SYNTEZY RDZENIA', 'REACTOR SYNTHESIS STAGE PROGRESS')}</span>
+                <span className="text-g font-bold">{genPhase.toUpperCase()}</span>
+              </div>
+              <div className="h-1.5 w-full bg-white/5 relative overflow-hidden rounded-sm">
+                <div 
+                  className="h-full bg-gradient-to-r from-g to-cyan transition-all duration-300"
+                  style={{ width: `${genProgress}%` }}
+                />
+              </div>
+
+              {/* Dynamic detail system logs log */}
+              <div className="text-[9px] text-[#c8e6d2]/60 mt-2 font-mono leading-relaxed h-[42px] overflow-hidden font-bold">
+                {genPhase === 'analyzing' && `>>> [ANALYZING]: Interpreting user prompt "${prompt}"... Choosing ideal metadata fields and token attributes.`}
+                {genPhase === 'synthesizing' && `>>> [SYNTHESIZING]: Designing optimal total supply constraints and setting up highly localized Polish/English marketing blurbs.`}
+                {genPhase === 'compiling' && `>>> [COMPILING]: Translating program logic to Anchor Rust Framework. Optimizing accounts and rent exemption spaces on Solana SVM.`}
+                {genPhase === 'auditing' && `>>> [AUDITING]: Security Shield running on Rust bytecode. Verifying no malicious vulnerabilities, guaranteeing 100% non-custodial structure.`}
+                {genPhase === 'deployed' && `>>> [SUCCESS]: Contract blueprint successfully compiled! Preparing workspace console.`}
+              </div>
+            </div>
+
+            {/* Checklist of phases */}
+            <div className="space-y-1.5 border border-white/5 bg-black/40 p-3 rounded-sm text-[9px]">
+              <div className="flex items-center justify-between">
+                <span className="text-white/40">{t('Zaprojektowane APY stakowania', 'Target APY reward')}</span>
+                <span className="text-g font-bold">164.8% APY</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/40">{t('Bezpieczeństwo Smart Contract', 'Contract Safety')}</span>
+                <span className="text-cyan font-bold">100% Non-Custodial</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/40">{t('Szybkość kompilatora', 'Compiler Speed')}</span>
+                <span className="text-g font-bold">&lt; 3.0s</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

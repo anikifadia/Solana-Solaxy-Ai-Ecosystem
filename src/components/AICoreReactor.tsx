@@ -91,6 +91,12 @@ export default function AICoreReactor() {
     setPromptInput(targetPrompt);
     setSimulationState('analyzing');
     setSimProgress(0);
+
+    // Dispatch custom event with user prompt to trigger real-time generation on AI Factory page
+    const event = new CustomEvent('start-ai-generation', { 
+      detail: { prompt: targetPrompt } 
+    });
+    window.dispatchEvent(event);
   };
 
   const handleResetSim = () => {
