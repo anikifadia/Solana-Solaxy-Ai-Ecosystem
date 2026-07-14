@@ -26,7 +26,6 @@ interface SwapPageProps {
   setTradeError: (msg: string | null) => void;
   isTrading: boolean;
   handleExecuteTrade: (ticker: string) => void;
-  walletBalances?: Record<string, number>;
 }
 
 export default function SwapPage({
@@ -45,7 +44,6 @@ export default function SwapPage({
   setTradeError,
   isTrading,
   handleExecuteTrade,
-  walletBalances = {},
 }: SwapPageProps) {
   return (
     <div className="pt-[110px]">
@@ -214,35 +212,12 @@ export default function SwapPage({
 
                   {/* Input Form */}
                   <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <label className="block text-[10px] text-white/40 uppercase tracking-[1px]">
-                        {tradeType === 'BUY' 
-                          ? t('Wpłać Ilość $SLX:', 'Pay $SLX Amount:') 
-                          : t(`Wpłać Ilość ${selectedTokenForTrade.ticker}:`, `Pay ${selectedTokenForTrade.ticker} Amount:`)
-                        }
-                      </label>
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] text-g font-bold font-mono">
-                          {t('Saldo: ', 'Balance: ')}
-                          {tradeType === 'BUY' 
-                            ? `${(walletBalances['$SLX'] || 0).toLocaleString(undefined, {maximumFractionDigits: 2})} $SLX`
-                            : `${(walletBalances[selectedTokenForTrade.ticker.toUpperCase()] || 0).toLocaleString(undefined, {maximumFractionDigits: 2})} ${selectedTokenForTrade.ticker}`
-                          }
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const maxAmt = tradeType === 'BUY' 
-                              ? (walletBalances['$SLX'] || 0)
-                              : (walletBalances[selectedTokenForTrade.ticker.toUpperCase()] || 0);
-                            setTradeAmount(maxAmt.toString());
-                          }}
-                          className="text-[9px] text-cyan hover:text-white bg-cyan/10 hover:bg-cyan/20 border border-cyan/30 px-1.5 py-0.5 font-mono cursor-pointer transition-colors"
-                        >
-                          {t('Maks.', 'Max')}
-                        </button>
-                      </div>
-                    </div>
+                    <label className="block text-[10px] text-white/40 uppercase tracking-[1px] mb-1.5">
+                      {tradeType === 'BUY' 
+                        ? t('Wpłać Ilość $SLX:', 'Pay $SLX Amount:') 
+                        : t(`Wpłać Ilość ${selectedTokenForTrade.ticker}:`, `Pay ${selectedTokenForTrade.ticker} Amount:`)
+                      }
+                    </label>
                     <div className="relative">
                       <input
                         type="number"

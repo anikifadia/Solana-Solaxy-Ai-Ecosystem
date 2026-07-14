@@ -95,7 +95,7 @@ Create a stunning, highly detailed, and futuristic vector graphic matching the t
 
         const text = response.text;
         if (!text) {
-          throw new Error("Empty document returned by API");
+          throw new Error("Pusty dokument zwrócony przez API");
         }
 
         tokenData = JSON.parse(text.trim()) as GeneratedToken;
@@ -122,6 +122,6 @@ Create a stunning, highly detailed, and futuristic vector graphic matching the t
   if (tokenData) {
     return tokenData;
   } else {
-    throw lastError || new Error("All attempts to connect to Gemini models failed.");
+    throw lastError || new Error("Wszystkie próby połączenia z modelami Gemini zakończyły się niepowodzeniem.");
   }
 }

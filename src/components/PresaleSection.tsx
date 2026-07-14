@@ -83,12 +83,12 @@ export const PresaleSection: React.FC = () => {
   // --- Wallet & Form State ---
   const [walletConnected, setWalletConnected] = useState(false);
   const [userAddress, setUserAddress] = useState<string | null>(null);
-  const [walletType, setWalletType] = useState<'Phantom' | 'Solflare' | 'Beta' | 'Manual' | null>(null);
+  const [walletType, setWalletType] = useState<'Phantom' | 'Solflare' | 'Demo' | 'Manual' | null>(null);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   
   const [payAmount, setPayAmount] = useState('2.5');
-  const [isDemoMode, setIsDemoMode] = useState(true); // Default to Beta Mode for testing, can toggle
+  const [isDemoMode, setIsDemoMode] = useState(true); // Default to Demo Mode for testing, can toggle
   const [manualSignature, setManualSignature] = useState('');
   const [manualAddressInput, setManualAddressInput] = useState('');
   
@@ -168,8 +168,8 @@ export const PresaleSection: React.FC = () => {
       } else {
         // Fallback if extension not installed
         throw new Error(t(
-          "Nie znaleziono wtyczki Phantom. Zainstaluj Phantom lub użyj trybu manualnego.",
-          "Phantom Wallet extension not found. Install it or use Manual mode."
+          "Nie znaleziono wtyczki Phantom. Zainstaluj Phantom lub użyj trybu demo/manualnego.",
+          "Phantom Wallet extension not found. Install it or use Demo/Manual mode."
         ));
       }
     } catch (e: any) {
@@ -196,8 +196,8 @@ export const PresaleSection: React.FC = () => {
         setTimeout(() => setSuccessMsg(null), 4000);
       } else {
         throw new Error(t(
-          "Nie znaleziono wtyczki Solflare. Zainstaluj Solflare lub użyj trybu manualnego.",
-          "Solflare extension not found. Install it or use Manual mode."
+          "Nie znaleziono wtyczki Solflare. Zainstaluj Solflare lub użyj trybu demo/manualnego.",
+          "Solflare extension not found. Install it or use Demo/Manual mode."
         ));
       }
     } catch (e: any) {
@@ -211,12 +211,12 @@ export const PresaleSection: React.FC = () => {
   const connectDemoWallet = () => {
     setIsConnecting(true);
     setTimeout(() => {
-      setUserAddress("SolBeta11119A2fZk9zPKoparkaSolaxy");
+      setUserAddress("SolDeMo11119A2fZk9zPKoparkaSolaxy");
       setWalletConnected(true);
-      setWalletType('Beta');
+      setWalletType('Demo');
       setShowWalletModal(false);
       setIsConnecting(false);
-      setSuccessMsg(t('Połączono pomyślnie z Solaxy Beta Wallet!', 'Connected successfully with Solaxy Beta Wallet!'));
+      setSuccessMsg(t('Połączono pomyślnie z Sandbox Demo Wallet!', 'Connected successfully with Sandbox Demo Wallet!'));
       setTimeout(() => setSuccessMsg(null), 4000);
     }, 600);
   };
@@ -270,7 +270,7 @@ export const PresaleSection: React.FC = () => {
     setSuccessMsg(null);
 
     try {
-      if (isDemoMode || walletType === 'Beta' || walletType === 'Manual') {
+      if (isDemoMode || walletType === 'Demo' || walletType === 'Manual') {
         // Sandbox / Simulated purchase or manual tracking setup
         const fakeSignature = 'demo_tx_' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
         
@@ -279,7 +279,7 @@ export const PresaleSection: React.FC = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             signature: fakeSignature,
-            userAddress: userAddress || 'SolBeta...Wallet',
+            userAddress: userAddress || 'SolDemo...Wallet',
             amountSol: sol,
             isDemo: true
           })
@@ -290,25 +290,10 @@ export const PresaleSection: React.FC = () => {
           throw new Error(data.error || "Wystąpił błąd podczas symulacji.");
         }
 
-        // Update local wallet balances
-        if (userAddress) {
-          const key = `solaxy_wallet_balances_${userAddress}`;
-          const saved = localStorage.getItem(key);
-          let currentBals: Record<string, number> = { '$SLX': 5000 };
-          if (saved) {
-            try {
-              currentBals = JSON.parse(saved);
-            } catch (e) {}
-          }
-          currentBals['$SLX'] = (currentBals['$SLX'] || 0) + tokensReceived;
-          localStorage.setItem(key, JSON.stringify(currentBals));
-          window.dispatchEvent(new Event('solaxy-balance-updated'));
-        }
-
         setSuccessMsg(
           t(
-            `Zakup udany (SYMULACJA BETA)! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja została odnotowana w bazie.`,
-            `Purchase successful (BETA SIMULATION)! Received ${tokensReceived.toLocaleString()} $SLX. Transaction logged in the database.`
+            `Zakup udany (TRYB DEMO)! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja została odnotowana w bazie.`,
+            `Purchase successful (DEMO MODE)! Received ${tokensReceived.toLocaleString()} $SLX. Transaction logged in the database.`
           )
         );
         fetchPresaleStatus();
@@ -362,21 +347,6 @@ export const PresaleSection: React.FC = () => {
           throw new Error(data.error || t("Weryfikacja na blockchainie nie powiodła się. Sprawdź status za chwilę.", "Blockchain verification failed. Check status again shortly."));
         }
 
-        // Update local wallet balances
-        if (userAddress) {
-          const key = `solaxy_wallet_balances_${userAddress}`;
-          const saved = localStorage.getItem(key);
-          let currentBals: Record<string, number> = { '$SLX': 5000 };
-          if (saved) {
-            try {
-              currentBals = JSON.parse(saved);
-            } catch (e) {}
-          }
-          currentBals['$SLX'] = (currentBals['$SLX'] || 0) + tokensReceived;
-          localStorage.setItem(key, JSON.stringify(currentBals));
-          window.dispatchEvent(new Event('solaxy-balance-updated'));
-        }
-
         setSuccessMsg(
           t(
             `Zakup udany! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja o podpisie ${signature.substring(0, 8)}... została potwierdzona na Solana.`,
@@ -413,7 +383,7 @@ export const PresaleSection: React.FC = () => {
         body: JSON.stringify({
           signature,
           userAddress: userAddress || 'ManualBuyer...Wallet',
-          isDemo: isDemoMode // Respect the beta mode switch
+          isDemo: isDemoMode // Respect the demo mode switch
         })
       });
 
@@ -421,20 +391,6 @@ export const PresaleSection: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.error || t("Nie znaleziono transakcji o tym podpisie przesyłającej SOL do nas.", "No transaction with this signature transferring SOL to us was found."));
       }
-
-      // Update local wallet balances
-      const targetAddr = userAddress || 'ManualBuyer...Wallet';
-      const key = `solaxy_wallet_balances_${targetAddr}`;
-      const saved = localStorage.getItem(key);
-      let currentBals: Record<string, number> = { '$SLX': 5000 };
-      if (saved) {
-        try {
-          currentBals = JSON.parse(saved);
-        } catch (e) {}
-      }
-      currentBals['$SLX'] = (currentBals['$SLX'] || 0) + data.contribution.amountSlx;
-      localStorage.setItem(key, JSON.stringify(currentBals));
-      window.dispatchEvent(new Event('solaxy-balance-updated'));
 
       setSuccessMsg(t(
         `Transakcja pomyślnie zweryfikowana! Przypisano ${data.contribution.amountSlx.toLocaleString()} $SLX do Twojego konta.`,
@@ -643,10 +599,10 @@ export const PresaleSection: React.FC = () => {
                   <span className="font-display text-xs tracking-[2px] text-cyan uppercase">{t('BŁYSKAWICZNA WYMIANA', 'PRESALE SWAP')}</span>
                 </div>
                 
-                {/* Beta mode selector */}
+                {/* Demo mode selector */}
                 <div className="flex items-center gap-1.5 px-2 py-0.5 bg-yellow-500/5 border border-yellow-500/20 rounded">
                   <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-                  <span className="text-[7.5px] font-mono text-yellow-400 uppercase tracking-[1px] font-bold">Beta</span>
+                  <span className="text-[7.5px] font-mono text-yellow-400 uppercase tracking-[1px] font-bold">Demo</span>
                   <input 
                     type="checkbox" 
                     checked={isDemoMode}
@@ -827,7 +783,7 @@ export const PresaleSection: React.FC = () => {
               ) : (
                 <>
                   <Zap className="w-3.5 h-3.5 text-cyan" />
-                  {isDemoMode ? t('WYKONAJ SYMULOWANY SWAP (BETA)', 'EXECUTE SIMULATED SWAP (BETA)') : t('ZATWIERDŹ SWAP (SOLANA)', 'EXECUTE PRESALE BUY')}
+                  {isDemoMode ? t('WYKONAJ TESTOWY SWAP (FREE)', 'EXECUTE TEST SWAP (FREE)') : t('ZATWIERDŹ SWAP (SOLANA)', 'EXECUTE PRESALE BUY')}
                 </>
               )}
             </button>
@@ -972,7 +928,7 @@ export const PresaleSection: React.FC = () => {
                     <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-cyan transition-colors" />
                   </button>
 
-                  {/* Beta Simulation Connector */}
+                  {/* Sandbox Demo Connector */}
                   <button
                     onClick={connectDemoWallet}
                     className="flex items-center justify-between p-3 border border-yellow-500/10 bg-yellow-500/5 hover:bg-yellow-500/10 hover:border-yellow-500/50 transition-all rounded text-left group cursor-pointer"
@@ -980,7 +936,7 @@ export const PresaleSection: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 text-yellow-500 text-[10px] font-bold">SOL</div>
                       <div>
-                        <span className="text-xs font-bold text-yellow-400 block">{t('Beta Simulation Wallet', 'Beta Simulation Wallet')}</span>
+                        <span className="text-xs font-bold text-yellow-400 block">{t('Demo Sandbox Wallet', 'Demo Sandbox Wallet')}</span>
                         <span className="text-[8.5px] text-yellow-500/60 block">{t('Bezpośrednia symulacja bez wtyczki', 'Direct simulation without any extension')}</span>
                       </div>
                     </div>

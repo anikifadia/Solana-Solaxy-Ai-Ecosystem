@@ -460,19 +460,6 @@ export default function MiningStakingForge() {
         localStorage.setItem('solax_users', JSON.stringify(usersList));
       }
 
-      // Update global wallet balance for the target wallet
-      const walletKey = `solaxy_wallet_balances_${wallet}`;
-      const savedBals = localStorage.getItem(walletKey);
-      let currentBals: Record<string, number> = { '$SLX': 5000 };
-      if (savedBals) {
-        try {
-          currentBals = JSON.parse(savedBals);
-        } catch (e) {}
-      }
-      currentBals['$SLX'] = (currentBals['$SLX'] || 0) + amt;
-      localStorage.setItem(walletKey, JSON.stringify(currentBals));
-      window.dispatchEvent(new Event('solaxy-balance-updated'));
-
       setSavedSlx(data.newBalance);
       setWithdrawSuccess(true);
       setWithdrawAmountInput('');
@@ -586,7 +573,7 @@ export default function MiningStakingForge() {
     }
 
     if (amt > savedSlx) {
-      addLog(t('BŁĄD: Za mało $SLX na koncie górnika!', 'ERROR: Insufficient $SLX in miner account!'));
+      addLog(t('BŁĄD: Za mało $SLX na koncie wydobywcy!', 'ERROR: Insufficient $SLX in miner account!'));
       return;
     }
 
@@ -671,7 +658,7 @@ export default function MiningStakingForge() {
     }
 
     if (amt > savedSlx) {
-      addLog(t('BŁĄD: Za mało $SLX na koncie górnika!', 'ERROR: Insufficient $SLX in miner account!'));
+      addLog(t('BŁĄD: Za mało $SLX na koncie wydobywcy!', 'ERROR: Insufficient $SLX in miner account!'));
       return;
     }
 
@@ -721,15 +708,15 @@ export default function MiningStakingForge() {
 
       <div className="mb-6">
         <div className="flex items-center gap-2 text-[10px] tracking-[4px] uppercase text-g/60 font-bold mb-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-g animate-ping" /> {t('INNOWACYJNE GÓRNICTWO & KUŹNIA', 'INNOVATIVE MINING & FORGE')}
+          <span className="w-1.5 h-1.5 rounded-full bg-g animate-ping" /> {t('INNOWACYJNE WYDOBYWANIE & KUŹNIA', 'INNOVATIVE MINING & FORGE')}
         </div>
         <h3 className="font-display text-2xl md:text-3xl tracking-[1px] text-white uppercase">
-          {t('KOPALNIA I KUŹNIA TOKENÓW - ', 'TOKEN MINE & FORGE - ')}<span className="text-g text-shadow-[0_0_8px_rgba(0,255,136,0.35)]">SOLAXY MINING</span>
+          {t('WYDOBYWANIE I KUŹNIA TOKENÓW - ', 'TOKEN MINE & FORGE - ')}<span className="text-g text-shadow-[0_0_8px_rgba(0,255,136,0.35)]">SOLAXY MINING</span>
         </h3>
         <p className="text-xs text-[#c8e6d2]/50 mt-1 max-w-[640px]">
           {t(
-            'Połączenie najprostszego na świecie tworzenia tokenów z innowacyjnym systemem wirtualnego górnictwa (Mining) i stabilnego stakowania (Staking Vault).',
-            'Combining the simplest token creation in the world with an innovative virtual mining system (Mining) and stable staking (Staking Vault).'
+            'Połączenie najprostszego na świecie tworzenia tokenów z innowacyjnym systemem wirtualnego wydobywania płynności (Liquidity Mining), stabilnego stakowania (Staking Vault) oraz kuźni deflacyjnej (Deflationary Forge).',
+            'Combining the simplest token creation in the world with an innovative virtual liquidity mining system (Liquidity Mining), stable staking (Staking Vault) and deflationary forge (Deflationary Forge).'
           )}
         </p>
       </div>
@@ -759,7 +746,7 @@ export default function MiningStakingForge() {
           }`}
         >
           <Hammer className="w-4 h-4" />
-          <span className="text-[10px] md:text-xs font-bold tracking-[2px] uppercase">{t('GÓRNICTWO PŁYNNOŚCI', 'LIQUIDITY MINING')}</span>
+          <span className="text-[10px] md:text-xs font-bold tracking-[2px] uppercase">{t('WYDOBYWANIE PŁYNNOŚCI', 'LIQUIDITY MINING')}</span>
         </button>
 
         {/* Tab 3: Deflation */}
@@ -785,9 +772,9 @@ export default function MiningStakingForge() {
             <div className="flex flex-col gap-4">
               {currentUser ? (
                 <div className="bg-white/5 border border-white/10 p-3.5 rounded flex flex-col gap-2">
-                  <div className="text-[10px] text-white/40 uppercase tracking-[1px] font-bold border-b border-white/5 pb-1">{t('ZASOBY PORTFELA GÓRNIKA', 'MINER WALLET FUNDS')}</div>
+                  <div className="text-[10px] text-white/40 uppercase tracking-[1px] font-bold border-b border-white/5 pb-1">{t('ZASOBY PORTFELA WYDOBYWCY', 'MINER WALLET FUNDS')}</div>
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-white/60">{t('Zapisane wykopane $SLX:', 'Saved mined $SLX:')}</span>
+                    <span className="text-white/60">{t('Zapisane wydobyte $SLX:', 'Saved mined $SLX:')}</span>
                     <span className="text-g font-bold text-sm">{savedSlx.toFixed(4)} $SLX</span>
                   </div>
                   <div className="flex justify-between items-center text-xs">
@@ -803,8 +790,8 @@ export default function MiningStakingForge() {
                 </div>
               ) : (
                 <div className="bg-yellow-500/10 border border-yellow-500/20 p-3.5 rounded text-xs leading-relaxed text-white/70">
-                  <div className="text-[9px] text-yellow-500 font-bold uppercase tracking-[1px] mb-1">{t('WERSJA BETA', 'BETA VERSION')}</div>
-                  {t('Zaloguj się na węzeł po prawej w zakładce „Górnictwo”, aby stakować własne zarobione tokeny i zyskać bonus do hashrate!', 'Log in as a miner in the "Mining" tab to stake your earned tokens and gain a real-time hashrate bonus!')}
+                  <div className="text-[9px] text-yellow-500 font-bold uppercase tracking-[1px] mb-1">{t('TRYB DEMONSTRACYJNY', 'DEMONSTRATION MODE')}</div>
+                  {t('Zaloguj się na węzeł po prawej w zakładce „Wydobywanie”, aby stakować własne zarobione tokeny i zyskać bonus do hashrate!', 'Log in as a miner in the "Mining" tab to stake your earned tokens and gain a real-time hashrate bonus!')}
                 </div>
               )}
 
@@ -933,9 +920,9 @@ export default function MiningStakingForge() {
           ) : (
             <button 
               className="w-full py-4 border border-g text-g font-bold tracking-[4px] uppercase text-xs hover:bg-g/15 hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] transition-all duration-300 interactive-cursor"
-              onClick={() => alert(t('W wersji Beta stakowanie jest symulowane. Zarejestruj się / zaloguj na konto węzła po prawej, aby stakować własny wykopany plon!', 'Staking simulated in Beta version. Register/login as a node on the right to stake your own mined balance!'))}
+              onClick={() => alert(t('W AI Studio Preview zasymulowano stakowanie. Zarejestruj się / zaloguj na konto węzła po prawej, aby stakować własny wydobyty plon!', 'Staking simulated in AI Studio Preview. Register/login as a node on the right to stake your own mined balance!'))}
             >
-              {t('DEPOZYT W SEJFIE STAKOWANIA (BETA)', 'DEPOSIT TO STAKING VAULT (BETA)')}
+              {t('DEPOZYT W SEJFIE STAKOWANIA (TRYB DEMO)', 'DEPOSIT TO STAKING VAULT (DEMO)')}
             </button>
           )}
         </div>
@@ -953,7 +940,7 @@ export default function MiningStakingForge() {
                    <span className={`text-[10px] border px-2 py-0.5 font-bold tracking-[1.5px] uppercase ${
                      isMining ? 'border-cyan text-cyan bg-cyan/5' : 'border-white/20 text-white/40'
                    }`}>
-                     {isMining ? t('GÓRNICTWO AKTYWNE', 'ACTIVE MINING') : t('OFFLINE', 'OFFLINE')}
+                     {isMining ? t('WYDOBYWANIE AKTYWNE', 'ACTIVE MINING') : t('OFFLINE', 'OFFLINE')}
                    </span>
                  </div>
  
@@ -1042,7 +1029,7 @@ export default function MiningStakingForge() {
                   <div className="mt-4 bg-black/40 border border-g/25 p-2 rounded">
                     <div className="text-[9px] text-g/70 uppercase tracking-[1px] font-bold">{t('USTAWIENIA PORTFELA', 'WALLET SETTINGS')}</div>
                     <div className="text-xs text-white/80 mt-1 flex justify-between items-center">
-                      <span>{t('Wykopane $SLX:', 'Mined $SLX:')}</span>
+                      <span>{t('Wydobyte $SLX:', 'Mined $SLX:')}</span>
                       <span className="text-g font-bold text-shadow-[0_0_6px_#00ff88]">{savedSlx.toFixed(4)} $SLX</span>
                     </div>
 
@@ -1123,7 +1110,7 @@ export default function MiningStakingForge() {
                   <div className="mt-4 bg-r/10 border border-r/25 p-2 rounded animate-pulse">
                     <div className="text-[9px] text-r uppercase tracking-[1px] font-bold">{t('SESJA OFFLINE', 'OFFLINE SESSION')}</div>
                     <div className="text-[10px] text-white/60 mt-1 leading-snug">
-                      {t('Zarejestruj węzeł konta po prawej, aby zapisać wykopany plon.', 'Register an account node on the right to save the mined yield.')}
+                      {t('Zarejestruj węzeł konta po prawej, aby zapisać wydobyty plon.', 'Register an account node on the right to save the mined yield.')}
                     </div>
                   </div>
                 )}
@@ -1278,7 +1265,7 @@ export default function MiningStakingForge() {
 
             <p className="text-[11px] text-white/50 mb-4 leading-relaxed">
               {t(
-                'Inwestuj swoje wykopane i zapisane tokeny $SLX bezpośrednio w moc obliczeniową! Lepsze podzespoły podwyższają bazowy hashrate oraz mnożą zysk.',
+                'Inwestuj swoje wydobyte i zapisane tokeny $SLX bezpośrednio w moc obliczeniową! Lepsze podzespoły podwyższają bazowy hashrate oraz mnożą zysk.',
                 'Invest your mined and saved $SLX tokens directly into hashpower! Higher tiers increase base hashrate and multiply your earnings.'
               )}
             </p>
@@ -1440,21 +1427,16 @@ export default function MiningStakingForge() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-2 mb-6">
-            <button 
-              onClick={() => setIsMining(!isMining)}
-              className={`w-full py-4 border font-bold tracking-[4px] uppercase text-xs transition-all duration-300 interactive-cursor ${
-                isMining 
-                  ? 'border-r text-r hover:bg-r/10 hover:shadow-[0_0_20px_rgba(255,26,74,0.3)]' 
-                  : 'border-cyan text-cyan hover:bg-cyan/15 hover:shadow-[0_0_20px_rgba(0,238,255,0.3)]'
-              }`}
-            >
-              {isMining ? t('⚡ WYŁĄCZ DECYZJĘ WYDOBYCIA', '⚡ SHUTDOWN ASSET EXCAVATOR') : t('⚡ URUCHOM DECYZJĘ WYDOBYCIA', '⚡ LAUNCH ASSET EXCAVATOR')}
-            </button>
-            <span className="text-[10px] text-white/50 uppercase tracking-[1px] text-center">
-              {t('Uwaga: Wydobywanie odbywa się tylko w aktywnej karcie przeglądarki.', 'Note: Mining only occurs while this browser tab is active.')}
-            </span>
-          </div>
+          <button 
+            onClick={() => setIsMining(!isMining)}
+            className={`w-full py-4 border font-bold tracking-[4px] uppercase text-xs transition-all duration-300 interactive-cursor mb-6 ${
+              isMining 
+                ? 'border-r text-r hover:bg-r/10 hover:shadow-[0_0_20px_rgba(255,26,74,0.3)]' 
+                : 'border-cyan text-cyan hover:bg-cyan/15 hover:shadow-[0_0_20px_rgba(0,238,255,0.3)]'
+            }`}
+          >
+            {isMining ? t('⚡ WYŁĄCZ DECYZJĘ WYDOBYCIA', '⚡ SHUTDOWN ASSET EXCAVATOR') : t('⚡ URUCHOM DECYZJĘ WYDOBYCIA', '⚡ LAUNCH ASSET EXCAVATOR')}
+          </button>
 
           {/* Real-time Mining Network Database & History section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -1510,7 +1492,7 @@ export default function MiningStakingForge() {
                     ) : (
                       <tr>
                         <td colSpan={4} className="py-6 text-center text-white/30 italic">
-                          {t('Twój węzeł jest nieaktywny. Zarejestruj się / zaloguj po prawej stronie i uruchom kopalnię, aby aktywować swój węzeł.', 'Your node is inactive. Register or log in on the right and launch the miner to activate your node.')}
+                          {t('Twój węzeł jest nieaktywny. Zarejestruj się / zaloguj po prawej stronie i uruchom wydobywanie, aby aktywować swój węzeł.', 'Your node is inactive. Register or log in on the right and launch the miner to activate your node.')}
                         </td>
                       </tr>
                     )}
@@ -1559,7 +1541,7 @@ export default function MiningStakingForge() {
                   })
                 ) : (
                   <div className="text-xs text-white/30 italic text-center py-4 font-mono">
-                    {t('Brak rzeczywistych transakcji w historii. Aktywuj kopalnię i dokonaj zapisu plonu, aby zobaczyć autentyczne dane.', 'No real transactions in history. Activate the miner and save your yield to see authentic data.')}
+                    {t('Brak rzeczywistych transakcji w historii. Aktywuj wydobywanie i dokonaj zapisu plonu, aby zobaczyć autentyczne dane.', 'No real transactions in history. Activate the miner and save your yield to see authentic data.')}
                   </div>
                 )}
               </div>
@@ -1667,7 +1649,7 @@ export default function MiningStakingForge() {
               ) : (
                 <div className="bg-yellow-500/10 border border-yellow-500/20 p-3.5 rounded text-xs leading-relaxed text-white/70">
                   <div className="text-[9px] text-yellow-500 font-bold uppercase tracking-[1px] mb-1">{t('KONTROLA PIECA ZABLOKOWANA', 'SMELTER CONTROL LOCKED')}</div>
-                  {t('Zaloguj się do swojego węzła po prawej, aby móc fizycznie palić wykopany kapitał $SLX i aktywować stały bonus do zysku z wydobycia!', 'Log in to your node on the right to physically burn your mined $SLX capital and activate a permanent yield rate boost!')}
+                  {t('Zaloguj się do swojego węzła po prawej, aby móc fizycznie palić wydobyty kapitał $SLX i aktywować stały bonus do zysku z wydobycia!', 'Log in to your node on the right to physically burn your mined $SLX capital and activate a permanent yield rate boost!')}
                 </div>
               )}
 

@@ -82,7 +82,7 @@ export default function HomePage({
               <span className="absolute top-0 right-0 w-2 h-2 border-t border-r border-g/40" />
               <span className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-g/40" />
               <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-g/40" />
-              {t('ZOBACZ WIDEO ➔', 'WATCH VIDEO ➔')}
+              {t('WATCH DEMO ➔', 'WATCH DEMO ➔')}
             </button>
           </div>
 
@@ -229,14 +229,14 @@ export default function HomePage({
               </button>
             </div>
 
-            {/* Beta warning block */}
+            {/* Demo warning block */}
             <div className="bg-[#100b05] border border-amber-500/20 p-4 rounded flex items-start gap-3">
               <div className="p-1 bg-amber-500/10 border border-amber-500/20 rounded mt-0.5 shrink-0">
                 <Info className="w-4 h-4 text-amber-400" />
               </div>
               <div>
                 <h4 className="text-[10px] font-mono font-bold uppercase tracking-[2px] text-amber-400 mb-1">
-                  {t('WERSJA BETA', 'BETA VERSION')}
+                  {t('TRYB DEMONSTRACYJNY', 'DEMO MODE')}
                 </h4>
                 <p className="text-[11px] text-amber-200/80 leading-relaxed font-medium">
                   {t(

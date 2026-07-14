@@ -19,29 +19,8 @@ const router = Router();
 // Zod Schemas
 const generateTokenSchema = z.object({
   body: z.object({
-    prompt: z.string().min(3, "Prompt must be at least 3 characters.")
+    prompt: z.string().min(3, "Prompt musi mieć co najmniej 3 znaki.")
   })
-});
-
-// Market Prices Fetcher Cache
-let cachedMarketPrices: any = null;
-let marketPricesLastFetched = 0;
-
-router.get("/market/prices", async (req, res) => {
-  const now = Date.now();
-  if (cachedMarketPrices && now - marketPricesLastFetched < 60000) {
-    return res.json(cachedMarketPrices); // return cached
-  }
-  try {
-    const response = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols=["SOLUSDT","BTCUSDT","ETHUSDT"]');
-    const data = await response.json();
-    cachedMarketPrices = data;
-    marketPricesLastFetched = now;
-    res.json(data);
-  } catch (err) {
-    console.error("Error fetching binance data", err);
-    res.json(cachedMarketPrices || []);
-  }
 });
 
 const submitPresaleSchema = z.object({
@@ -55,8 +34,8 @@ const submitPresaleSchema = z.object({
 
 const deployTokenSchema = z.object({
   body: z.object({
-    name: z.string().min(2, "Token name must be at least 2 characters."),
-    ticker: z.string().min(2, "Ticker symbol must be at least 2 characters."),
+    name: z.string().min(2, "Nazwa tokenu musi mieć co najmniej 2 znaki."),
+    ticker: z.string().min(2, "Symbol ticker musi mieć co najmniej 2 znaki."),
     description: z.string().optional(),
     supply: z.number().positive(),
     iconType: z.string().optional(),
@@ -70,8 +49,7 @@ const tradeTokenSchema = z.object({
   body: z.object({
     ticker: z.string(),
     type: z.enum(["BUY", "SELL"]),
-    amount: z.number().positive(),
-    user: z.string().optional()
+    amount: z.number().positive()
   })
 });
 
@@ -107,7 +85,7 @@ router.post("/gemini/generate-token", validateRequest(generateTokenSchema), asyn
   } catch (error: any) {
     console.error("[Gemini API Router] Error:", error?.message || error);
     return res.status(500).json({
-      error: "AI token generation failed. Gemini service is currently overloaded. Please try again later.",
+      error: "Nie udało się wygenerować tokenu przez AI. Usługa Gemini jest aktualnie przeciążona. Spróbuj ponownie za chwilę.",
       details: error?.message || error
     });
   }
@@ -120,16 +98,7 @@ router.get("/mining/status", (req, res) => {
     return { ...m, isOnline };
   });
 
-  const now = Date.now();
-  let solPrice = 182.74; // Fallback
-  
-  if (cachedMarketPrices && Array.isArray(cachedMarketPrices)) {
-    const solData = cachedMarketPrices.find((item: any) => item.symbol === 'SOLUSDT');
-    if (solData) {
-      solPrice = parseFloat(solData.lastPrice);
-    }
-  }
-
+  const solPrice = 182.74;
   const totalMinedSol = Object.values(activeMiners).reduce((sum, m) => sum + (Number(m.balance) || 0), 0);
   
   const tvlUsd = 4700000000 + (tokens.length * 1500000) + (totalMinedSol * solPrice);
@@ -164,7 +133,7 @@ router.post("/presale/submit", validateRequest(submitPresaleSchema), async (req,
 
   // Check if transaction signature already exists
   if (presaleData.contributions.some((c) => c.signature === signature)) {
-    return res.status(400).json({ error: "This transaction has already been registered!" });
+    return res.status(400).json({ error: "Ta transakcja została już zarejestrowana!" });
   }
 
   let verificationResult;
@@ -207,10 +176,10 @@ router.post("/presale/submit", validateRequest(submitPresaleSchema), async (req,
   miningHistory.unshift({
     id: Math.random().toString(36).substring(2, 11),
     username: newContribution.address,
-    action: "SAVE_YIELD",
+    action: "ZAPIS_PLONU",
     amount: Number(verificationResult.solAmount),
     timestamp: new Date().toLocaleTimeString(),
-    details: `Bought ${tokensReceived.toLocaleString()} $SLX`
+    details: `Kupił ${tokensReceived.toLocaleString()} $SLX`
   });
 
   res.json({
@@ -227,7 +196,7 @@ router.post("/tokens/deploy", validateRequest(deployTokenSchema), (req, res) => 
   const formattedTicker = ticker.startsWith('$') ? ticker : `$${ticker}`;
 
   if (tokens.some(t => t.ticker.toUpperCase() === formattedTicker.toUpperCase())) {
-    return res.status(400).json({ error: "A token with this ticker already exists in pools!" });
+    return res.status(400).json({ error: "Token o tym tickerze już istnieje w pulach!" });
   }
 
   const supplyNum = Number(supply);
@@ -254,7 +223,7 @@ router.post("/tokens/deploy", validateRequest(deployTokenSchema), (req, res) => 
   miningHistory.unshift({
     id: Math.random().toString(36).substring(2, 11),
     username: "SYSTEM_DEX",
-    action: "EMISSION",
+    action: "EMISJA",
     amount: supplyNum,
     timestamp: new Date().toLocaleTimeString(),
     details: `Token ${newToken.name} (${newToken.ticker})`
@@ -265,11 +234,11 @@ router.post("/tokens/deploy", validateRequest(deployTokenSchema), (req, res) => 
 
 // 5. Token AMM Trade Swap
 router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
-  const { ticker, type, amount, user } = req.body;
+  const { ticker, type, amount } = req.body;
 
   const token = tokens.find(t => t.ticker.toUpperCase() === ticker.toUpperCase());
   if (!token) {
-    return res.status(404).json({ error: "Token not found in pools." });
+    return res.status(404).json({ error: "Token nie został znaleziony w pulach." });
   }
 
   const currentPriceSol = token.priceSol || 0.0001;
@@ -282,7 +251,7 @@ router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
     slxValue = amount;
     if ((token.remainingPool || 0) < tokenAmount) {
       return res.status(400).json({ 
-        error: `Insufficient pool liquidity! Only remaining: ${(token.remainingPool || 0).toLocaleString()} ${token.ticker}.` 
+        error: `Niewystarczająca płynność w puli! Pozostało tylko ${(token.remainingPool || 0).toLocaleString()} ${token.ticker}.` 
       });
     }
     token.remainingPool = Math.floor((token.remainingPool || 0) - tokenAmount);
@@ -296,12 +265,10 @@ router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
 
   saveTokens();
 
-  const formattedUser = user ? (user.substring(0, 4) + "..." + user.substring(user.length - 4)) : "AMM_KUPACZ";
-
   miningHistory.unshift({
     id: Math.random().toString(36).substring(2, 11),
-    username: formattedUser,
-    action: type === "BUY" ? "BUY" : "SELL",
+    username: "AMM_KUPACZ",
+    action: type === "BUY" ? "KUPNO" : "SPRZEDAŻ",
     amount: Number(tokenAmount.toFixed(4)),
     timestamp: new Date().toLocaleTimeString(),
     details: type === "BUY" 
@@ -317,8 +284,7 @@ router.post("/tokens/trade", validateRequest(tradeTokenSchema), (req, res) => {
     success: true, 
     remainingPool: token.remainingPool, 
     newPriceSol: token.priceSol,
-    tokenAmount,
-    slxValue
+    tokenAmount
   });
 });
 
@@ -340,7 +306,7 @@ router.post("/mining/heartbeat", validateRequest(minerHeartbeatSchema), (req, re
     miningHistory.unshift({
       id: Math.random().toString(36).substring(2, 11),
       username,
-      action: "REGISTRATION",
+      action: "REJESTRACJA",
       amount: 0,
       timestamp: new Date().toLocaleTimeString()
     });
@@ -376,7 +342,7 @@ router.post("/mining/save", validateRequest(saveMinedSchema), (req, res) => {
   miningHistory.unshift({
     id: Math.random().toString(36).substring(2, 11),
     username,
-    action: "SAVE_YIELD",
+    action: "ZAPIS_PLONU",
     amount,
     timestamp: new Date().toLocaleTimeString()
   });
@@ -393,11 +359,11 @@ router.post("/mining/withdraw", validateRequest(withdrawMinedSchema), (req, res)
   const { username, amount, wallet } = req.body;
 
   if (!activeMiners[username]) {
-    return res.status(404).json({ error: "User does not exist in the miner database." });
+    return res.status(404).json({ error: "Użytkownik nie istnieje w bazie kopaczy." });
   }
 
   if (activeMiners[username].balance < amount) {
-    return res.status(400).json({ error: "Insufficient miner balance for withdrawal." });
+    return res.status(400).json({ error: "Niewystarczające saldo kopacza do wypłaty." });
   }
 
   activeMiners[username].balance = Number((activeMiners[username].balance - amount).toFixed(6));
@@ -412,13 +378,13 @@ router.post("/mining/withdraw", validateRequest(withdrawMinedSchema), (req, res)
     amount,
     timestamp: new Date().toLocaleTimeString(),
     wallet: maskedWallet,
-    status: "COMPLETED"
+    status: "ZAKOŃCZONE"
   });
 
   miningHistory.unshift({
     id: Math.random().toString(36).substring(2, 11),
     username,
-    action: "WITHDRAWAL",
+    action: "WYPŁATA",
     amount,
     timestamp: new Date().toLocaleTimeString()
   });
@@ -436,20 +402,20 @@ export const contactSubmissions: any[] = [];
 router.post("/system/contact", (req, res) => {
   const { name, email, subject, message } = req.body;
   if (!name || !email || !message) {
-    return res.status(400).json({ error: "Please fill out all required fields." });
+    return res.status(400).json({ error: "Proszę wypełnić wszystkie wymagane pola." });
   }
 
   const submission = {
     id: "contact_" + Math.random().toString(36).substring(2, 9),
     name,
     email,
-    subject: subject || "General",
+    subject: subject || "Ogólne",
     message,
     timestamp: new Date().toISOString()
   };
 
   contactSubmissions.unshift(submission);
-  res.json({ success: true, message: "Your message has been successfully sent and registered!" });
+  res.json({ success: true, message: "Twoja wiadomość została pomyślnie wysłana i zarejestrowana!" });
 });
 
 // 10. System Live Telemetry Logs API
@@ -459,10 +425,10 @@ router.get("/system/telemetry", (req, res) => {
   const latencyRpc = Math.floor(18 + Math.random() * 22);
 
   const eventLogs = [
-    { timestamp: new Date(Date.now() - 5000).toLocaleTimeString(), level: "INFO", message: "RPC connection verified: api.mainnet-beta.solana.com" },
-    { timestamp: new Date(Date.now() - 12000).toLocaleTimeString(), level: "INFO", message: "Updated heartbeat of Solaxy decentralized mining pools" },
-    { timestamp: new Date(Date.now() - 35000).toLocaleTimeString(), level: "SUCCESS", message: "Saved DEX database checkpoint. Total registered tokens: " + tokens.length },
-    { timestamp: new Date(Date.now() - 48000).toLocaleTimeString(), level: "INFO", message: "Rate Limit filter pool: 0 blocked IPs in current epoch" }
+    { timestamp: new Date(Date.now() - 5000).toLocaleTimeString(), level: "INFO", message: "Połączenie z RPC zweryfikowane: api.mainnet-beta.solana.com" },
+    { timestamp: new Date(Date.now() - 12000).toLocaleTimeString(), level: "INFO", message: "Zaktualizowano tętno zdecentralizowanych pul wydobywczych Solaxy" },
+    { timestamp: new Date(Date.now() - 35000).toLocaleTimeString(), level: "SUCCESS", message: "Zapisano punkt kontrolny bazy danych DEX. Łączna liczba zarejestrowanych tokenów: " + tokens.length },
+    { timestamp: new Date(Date.now() - 48000).toLocaleTimeString(), level: "INFO", message: "Pula filtrów Rate Limit: 0 zablokowanych adresów IP w bieżącej epoce" }
   ];
 
   res.json({
