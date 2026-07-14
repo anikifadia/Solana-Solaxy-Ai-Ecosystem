@@ -50,6 +50,33 @@ export default function HomePage({
         
         {/* ════ SECTION 1: HERO ACTION HEADER & ARTWORK (Screenshot 3) ════ */}
         <section id="hero-header-artwork" className="flex flex-col items-center text-center">
+          
+          {/* Wielki napis: CREATE • LAUNCH • DOMINATE */}
+          <h1 className="font-display text-5xl sm:text-7xl md:text-[5rem] font-black leading-[1.1] tracking-[4px] mb-6 select-none relative">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00ff88] via-white to-[#00ff88] drop-shadow-[0_0_15px_rgba(0,255,136,0.5)]">
+              CREATE
+            </span>
+            <span className="text-white/30 mx-3 sm:mx-6 text-3xl sm:text-5xl align-middle">•</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-white to-cyan drop-shadow-[0_0_15px_rgba(0,238,255,0.5)]">
+              LAUNCH
+            </span>
+            <span className="text-white/30 mx-3 sm:mx-6 text-3xl sm:text-5xl align-middle">•</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-r via-white to-r drop-shadow-[0_0_15px_rgba(255,26,74,0.5)]">
+              DOMINATE
+            </span>
+          </h1>
+
+          {/* Centered Mascot Artwork */}
+          <div className="w-full max-w-[600px] relative overflow-hidden rounded-lg border border-g/20 bg-[#02050a]/90 shadow-[0_0_65px_rgba(0,255,136,0.18)] mb-10 group">
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none z-10" />
+            <img 
+              src={HERO_IMAGE} 
+              alt="Solaxy Mascot Hero" 
+              className="w-full h-auto object-cover transform scale-100 group-hover:scale-[1.02] transition-transform duration-1000 ease-in-out"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
           {/* Action Buttons Top Row */}
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full mb-10">
             <button 
@@ -71,7 +98,7 @@ export default function HomePage({
               <span className="absolute top-0 right-0 w-2 h-2 border-t border-r border-r" />
               <span className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-r" />
               <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-r" />
-              {t('⚡ TWÓRZ TOKEN', '⚡ CREATE TOKEN')}
+              {t('⚡ CREATE TOKEN', '⚡ CREATE TOKEN')}
             </button>
             
             <button 
@@ -86,17 +113,6 @@ export default function HomePage({
             </button>
           </div>
 
-          {/* Centered Beyond Chain Artwork */}
-          <div className="w-full relative overflow-hidden rounded-lg border border-g/20 bg-[#02050a]/90 shadow-[0_0_45px_rgba(0,255,136,0.18)] mb-10 group">
-            {/* Ambient inner glow */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none z-10" />
-            <img 
-              src={BEYOND_IMAGE} 
-              alt="Solaxy Beyond The Chain" 
-              className="w-full h-auto object-cover transform scale-100 group-hover:scale-[1.01] transition-transform duration-700"
-              referrerPolicy="no-referrer"
-            />
-          </div>
 
 
         </section>

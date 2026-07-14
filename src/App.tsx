@@ -541,10 +541,16 @@ export default function App() {
           className="flex items-center gap-3 decoration-none group interactive-cursor bg-transparent border-none cursor-pointer p-0 text-left"
         >
           <SlicedAsset asset="app-icon" className="w-8 h-8 rounded border border-g/20 animate-[pulse_3s_ease-in-out_infinite]" />
-          <span className="logo font-display text-2xl md:text-3xl tracking-[4px] text-white text-shadow-[0_0_10px_rgba(255,255,255,0.1)] group-hover:text-g group-hover:text-shadow-[0_0_12px_#00ff88] transition-all duration-300">
-            SOLAXY
-          </span>
-          <span className="logo-tag text-[9px] tracking-[3px] text-g border border-g/40 px-2 py-0.5 bg-g/5 font-bold rounded">
+          <div className="flex items-center relative">
+            <span className="font-display font-black text-2xl md:text-3xl tracking-[0.2em] uppercase relative">
+              <span className="absolute inset-0 bg-gradient-to-r from-[#00ff88] via-[#00eeff] to-[#00ff88] bg-[length:200%_auto] animate-[shimmer_3s_linear_infinite] bg-clip-text text-transparent blur-[8px] opacity-60 mix-blend-screen" />
+              <span className="relative bg-gradient-to-r from-[#e0ffe8] via-[#ffffff] to-[#c8e6d2] bg-clip-text text-transparent drop-shadow-[0_0_2px_rgba(0,255,136,0.8)]">
+                SOLAXY
+              </span>
+              <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#00ff88] to-transparent shadow-[0_0_8px_#00ff88] opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </span>
+          </div>
+          <span className="logo-tag text-[9px] tracking-[3px] text-g border border-g/40 px-2 py-0.5 bg-g/5 font-bold rounded shadow-[0_0_8px_rgba(0,255,136,0.2)]">
             DEX
           </span>
         </button>

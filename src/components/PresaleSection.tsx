@@ -904,7 +904,9 @@ export const PresaleSection: React.FC = () => {
                     className="flex items-center justify-between p-3 border border-white/10 bg-black/40 hover:bg-cyan/5 hover:border-cyan/50 transition-all rounded text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <img src="https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,g_faces,z_0.7/v1508215582/orlpxep7j0x8hicqas7e.png" alt="Phantom" className="w-6 h-6 rounded" referrerPolicy="no-referrer" />
+                      <div className="w-6 h-6 rounded bg-[#AB9FF2]/20 flex items-center justify-center">
+                        <ShieldCheck className="w-4 h-4 text-[#AB9FF2]" />
+                      </div>
                       <div>
                         <span className="text-xs font-bold text-white block group-hover:text-cyan transition-colors">Phantom Wallet</span>
                         <span className="text-[8.5px] text-white/30 block">Solana Browser Extension</span>
@@ -919,7 +921,9 @@ export const PresaleSection: React.FC = () => {
                     className="flex items-center justify-between p-3 border border-white/10 bg-black/40 hover:bg-cyan/5 hover:border-cyan/50 transition-all rounded text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <img src="https://play-lh.googleusercontent.com/Iatb0O03eA44N9e7iA8x8gK_Tq_qRscNnJ5o1GvK0i3mIuF0zR3_vC9p8vA_vX_0Y_0" alt="Solflare" className="w-6 h-6 rounded" referrerPolicy="no-referrer" />
+                      <div className="w-6 h-6 rounded bg-[#E45318]/20 flex items-center justify-center">
+                        <Zap className="w-4 h-4 text-[#E45318]" />
+                      </div>
                       <div>
                         <span className="text-xs font-bold text-white block group-hover:text-cyan transition-colors">Solflare Wallet</span>
                         <span className="text-[8.5px] text-white/30 block">Solana Web/Extension</span>
