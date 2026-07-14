@@ -4,7 +4,8 @@ import {
   Menu,
   X,
   ShieldCheck,
-  Palette
+  Palette,
+  Terminal
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import BackgroundEffects from './components/BackgroundEffects';
@@ -16,6 +17,7 @@ import ConnectWalletModal from './components/ConnectWalletModal';
 
 // Subpages
 import HomePage from './components/HomePage';
+import DashboardPage from './components/DashboardPage';
 import GeneratorPage from './components/GeneratorPage';
 import PresalePage from './components/PresalePage';
 import SwapPage from './components/SwapPage';
@@ -51,7 +53,7 @@ export default function App() {
   const [tickerData, setTickerData] = useState<TickerItem[]>(INITIAL_TICKER_DATA);
   const [solPrice, setSolPrice] = useState<number>(182.74);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState<'home' | 'generator' | 'presale' | 'swap' | 'network' | 'forge' | 'status'>('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'generator' | 'presale' | 'swap' | 'network' | 'forge' | 'status' | 'dashboard'>('home');
 
   // Theme Customizer State
   const [theme, setTheme] = useState<'deep-black' | 'midnight-blue'>(() => {
@@ -558,6 +560,15 @@ export default function App() {
         <ul className="hidden lg:flex gap-6 xl:gap-8 list-none items-center h-full">
           <li>
             <button 
+              onClick={() => { setCurrentPage('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+              className={`flex items-center gap-2 text-[10px] tracking-[2px] transition-all bg-transparent border-none cursor-pointer p-0 font-mono uppercase ${currentPage === 'dashboard' ? 'text-cyan text-shadow-[0_0_8px_#00eeff] font-extrabold' : 'text-cyan/70 hover:text-cyan'}`}
+            >
+              <Terminal className="w-3 h-3" />
+              {t('DASHBOARD AI', 'AI DASHBOARD')}
+            </button>
+          </li>
+          <li>
+            <button 
               onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
               className={`text-[10px] tracking-[2px] transition-all bg-transparent border-none cursor-pointer p-0 font-mono uppercase ${currentPage === 'home' ? 'text-g text-shadow-[0_0_8px_#00ff88] font-extrabold' : 'text-white/45 hover:text-white'}`}
             >
@@ -683,6 +694,18 @@ export default function App() {
             <ul className="flex flex-col gap-1.5 p-4 list-none font-mono m-0">
               <li>
                 <button 
+                  onClick={() => { setCurrentPage('dashboard'); setIsMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className={`w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 border-b border-white/5 bg-transparent border-none cursor-pointer text-left font-mono ${currentPage === 'dashboard' ? 'text-cyan text-shadow-[0_0_6px_rgba(0,238,255,0.35)]' : 'text-white/60 hover:text-cyan'}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4" />
+                    <span>{t('DASHBOARD AI', 'AI DASHBOARD')}</span>
+                  </div>
+                  <span className="text-[12px]">➔</span>
+                </button>
+              </li>
+              <li>
+                <button 
                   onClick={() => { setCurrentPage('home'); setIsMobileMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`w-full flex items-center justify-between text-sm sm:text-base font-bold tracking-[3px] py-4 px-6 border-b border-white/5 bg-transparent border-none cursor-pointer text-left font-mono ${currentPage === 'home' ? 'text-g text-shadow-[0_0_6px_rgba(0,255,136,0.35)]' : 'text-white/60 hover:text-white'}`}
                 >
@@ -784,6 +807,17 @@ export default function App() {
 
       {/* ══ DYNAMIC PAGES ROUTER ══ */}
       <AnimatePresence mode="wait">
+        {currentPage === 'dashboard' && (
+          <motion.div
+            key="dashboard"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.4 }}
+          >
+            <DashboardPage />
+          </motion.div>
+        )}
         {currentPage === 'home' && (
           <motion.div
             key="home"
@@ -912,28 +946,19 @@ export default function App() {
           © 2026 SOLAX PROTOCOL · {t('WSZELKIE PRAWA ZASTRZEŻONE', 'ALL RIGHTS RESERVED')}
         </div>
 
-        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
-          <button 
-            onClick={() => { setCurrentPage('status'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono bg-transparent border-none cursor-pointer transition-colors uppercase"
-          >
+        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center max-w-2xl">
+          <button onClick={() => { setCurrentPage('status'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono bg-transparent border-none cursor-pointer transition-colors uppercase">
             {t('STATUS SIECI', 'SYSTEM STATUS')}
           </button>
-          <button 
-            onClick={() => { setCurrentPage('status'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono bg-transparent border-none cursor-pointer transition-colors uppercase"
-          >
-            {t('O NAS & KONTAKT', 'ABOUT & CONTACT')}
-          </button>
-          <a href="https://github.com/solaxy-protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
-            GITHUB
-          </a>
-          <a href="https://x.com/solaxy_protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
-            X / TWITTER
-          </a>
-          <a href="https://t.me/solaxy_protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">
-            TELEGRAM
-          </a>
+          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">WHITEPAPER</a>
+          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">API DOCS</a>
+          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">SDK</a>
+          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">CHANGELOG</a>
+          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">ROADMAP</a>
+          <a href="https://github.com/solaxy-protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">GITHUB</a>
+          <a href="https://x.com/solaxy_protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">X</a>
+          <a href="https://t.me/solaxy_protocol" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">TELEGRAM</a>
+          <a href="#" className="text-white/40 hover:text-g text-[10px] tracking-[2px] font-mono decoration-none transition-colors">DISCORD</a>
         </div>
       </footer>
 
