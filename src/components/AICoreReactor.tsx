@@ -5,6 +5,7 @@ import {
   Sparkles, Play, Award, HelpCircle, Activity, ChevronRight 
 } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
+import { SolaxyEmoticon } from './SolaxyLogo';
 
 export default function AICoreReactor() {
   const { t } = useLanguage();
@@ -151,7 +152,7 @@ export default function AICoreReactor() {
 
           {simulationState === 'idle' && (
             <div className="z-10 flex flex-col items-center animate-fadeIn">
-              <Cpu className="w-10 h-10 text-g mb-2 animate-pulse" />
+              <SolaxyEmoticon className="w-12 h-12 mb-1" />
               <div className="text-[10px] text-white/40 uppercase tracking-[1px]">{t('PROFIL OPERACYJNY', 'OPERATIONAL PROFILE')}</div>
               <div className="text-xs font-bold text-white uppercase tracking-[1.5px] mt-1">{t('RDZEŃ AI', 'AI CORE')}</div>
               <div className="text-[8px] text-g mt-2 uppercase tracking-[2px]">{t('OCZEKIWANIE', 'STANDBY')}</div>

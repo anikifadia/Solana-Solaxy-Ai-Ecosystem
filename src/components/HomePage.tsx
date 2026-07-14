@@ -4,6 +4,7 @@ import { Flame, ShieldCheck, Pickaxe, Key, Coins, Info, Rocket, Sparkles, Server
 import SlicedAsset from './SlicedAsset';
 import RoadmapTimeline from './RoadmapTimeline';
 import Wormhole from './Wormhole';
+import InteractiveLandingHero from './InteractiveLandingHero';
 
 import HERO_IMAGE from '../assets/images/solaxy_mascot_hero_1783437956325.jpg';
 import BEYOND_IMAGE from '../assets/images/solaxy_infographic_1783981728892.jpg';
@@ -35,6 +36,7 @@ interface HomePageProps {
 export default function HomePage({
   t,
   scrollToSection,
+  setCurrentPage,
   isConnected,
   walletAddress,
   setIsWalletModalOpen,
@@ -46,64 +48,17 @@ export default function HomePage({
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-g/5 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/3 right-1/4 w-[600px] h-[600px] bg-r/5 rounded-full blur-[150px] pointer-events-none" />
 
+      {/* ════ SECTION 1: HERO ACTION HEADER & ARTWORK ════ */}
+      <InteractiveLandingHero 
+        t={t} 
+        scrollToSection={scrollToSection} 
+        setCurrentPage={setCurrentPage} 
+      />
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10 space-y-24">
         
-        {/* ════ SECTION 1: HERO ACTION HEADER & ARTWORK (Screenshot 3) ════ */}
-        <section id="hero-header-artwork" className="flex flex-col items-center text-center">
-          {/* Action Buttons Top Row */}
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full mb-10">
-            <button 
-              onClick={() => scrollToSection('presale')} 
-              className="relative w-full sm:w-auto px-8 py-3.5 bg-black/80 border border-g text-g font-bold rounded-sm tracking-[2px] uppercase text-xs sm:text-sm hover:bg-g/10 hover:shadow-[0_0_20px_rgba(0,255,136,0.4)] transition-all duration-300 select-none cursor-pointer"
-            >
-              <span className="absolute top-0 left-0 w-2 h-2 border-t border-l border-g" />
-              <span className="absolute top-0 right-0 w-2 h-2 border-t border-r border-g" />
-              <span className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-g" />
-              <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-g" />
-              {t('⚡ START PRESALE', '⚡ START PRESALE')}
-            </button>
-            
-            <button 
-              onClick={() => scrollToSection('generator')} 
-              className="relative w-full sm:w-auto px-8 py-3.5 bg-black/80 border border-r text-r font-bold rounded-sm tracking-[2px] uppercase text-xs sm:text-sm hover:bg-r/10 hover:shadow-[0_0_20px_rgba(255,26,74,0.4)] transition-all duration-300 select-none cursor-pointer"
-            >
-              <span className="absolute top-0 left-0 w-2 h-2 border-t border-l border-r" />
-              <span className="absolute top-0 right-0 w-2 h-2 border-t border-r border-r" />
-              <span className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-r" />
-              <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-r" />
-              {t('⚡ TWÓRZ TOKEN', '⚡ CREATE TOKEN')}
-            </button>
-            
-            <button 
-              onClick={() => scrollToSection('pools')} 
-              className="relative w-full sm:w-auto px-8 py-3.5 bg-black/85 border border-g/40 text-white/90 font-bold rounded-sm tracking-[2px] uppercase text-xs sm:text-sm hover:bg-g/5 hover:border-g transition-all duration-300 select-none cursor-pointer"
-            >
-              <span className="absolute top-0 left-0 w-2 h-2 border-t border-l border-g/40" />
-              <span className="absolute top-0 right-0 w-2 h-2 border-t border-r border-g/40" />
-              <span className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-g/40" />
-              <span className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-g/40" />
-              {t('ZOBACZ WIDEO ➔', 'WATCH VIDEO ➔')}
-            </button>
-          </div>
-
-          {/* Centered Beyond Chain Artwork */}
-          <div className="w-full relative overflow-hidden rounded-lg border border-g/20 bg-[#02050a]/90 shadow-[0_0_45px_rgba(0,255,136,0.18)] mb-10 group">
-            {/* Ambient inner glow */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none z-10" />
-            <img 
-              src={BEYOND_IMAGE} 
-              alt="Solaxy Beyond The Chain" 
-              className="w-full h-auto object-cover transform scale-100 group-hover:scale-[1.01] transition-transform duration-700"
-              referrerPolicy="no-referrer"
-            />
-          </div>
-
-
-        </section>
-
-
         {/* ════ SECTION 2: FUTURE OF SVM TRADING (Screenshot 2) ════ */}
-        <section id="future-svm" className="flex flex-col items-center text-center">
+        <section id="future-svm" className="flex flex-col items-center text-center mt-24">
           {/* Neon Display Header */}
           <h2 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold leading-[1.1] tracking-[3px] mb-6 select-none">
             <div className="text-g text-shadow-[0_0_15px_rgba(0,255,136,0.5)] uppercase">
@@ -229,26 +184,8 @@ export default function HomePage({
               </button>
             </div>
 
-            {/* Beta warning block */}
-            <div className="bg-[#100b05] border border-amber-500/20 p-4 rounded flex items-start gap-3">
-              <div className="p-1 bg-amber-500/10 border border-amber-500/20 rounded mt-0.5 shrink-0">
-                <Info className="w-4 h-4 text-amber-400" />
-              </div>
-              <div>
-                <h4 className="text-[10px] font-mono font-bold uppercase tracking-[2px] text-amber-400 mb-1">
-                  {t('WERSJA BETA', 'BETA VERSION')}
-                </h4>
-                <p className="text-[11px] text-amber-200/80 leading-relaxed font-medium">
-                  {t(
-                    'Zaloguj się na węzeł po prawej w zakładce „Górnictwo”, aby stakować własne zarobione tokeny w skarbcach i generować pasywny plon w czasie rzeczywistym.',
-                    'Zaloguj się na węzeł po prawej w zakładce „Górnictwo”, aby stakować własne zarobione tokeny w skarbcach i generować pasywny plon w czasie rzeczywistym.'
-                  )}
-                </p>
-              </div>
-            </div>
           </div>
         </section>
-
 
         {/* ════ SECTION 4: SZYBKA NAWIGACJA SATELLITE (Screenshot 4) ════ */}
         <section id="satellite-directory" className="flex flex-col items-center">

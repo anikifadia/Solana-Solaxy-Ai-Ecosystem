@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { useLanguage } from '../LanguageContext';
+import { SolaxyEmoticon } from './SolaxyLogo';
 import MASCOT_HERO from '../assets/images/solaxy_mascot_hero_1783437956325.jpg';
 
 interface PurchaseRecord {
@@ -216,7 +217,7 @@ export const PresaleSection: React.FC = () => {
       setWalletType('Beta');
       setShowWalletModal(false);
       setIsConnecting(false);
-      setSuccessMsg(t('Połączono pomyślnie z Solaxy Beta Wallet!', 'Connected successfully with Solaxy Beta Wallet!'));
+      setSuccessMsg(t('Połączono pomyślnie z Solaxy Cloud Wallet!', 'Connected successfully with Solaxy Cloud Wallet!'));
       setTimeout(() => setSuccessMsg(null), 4000);
     }, 600);
   };
@@ -307,8 +308,8 @@ export const PresaleSection: React.FC = () => {
 
         setSuccessMsg(
           t(
-            `Zakup udany (SYMULACJA BETA)! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja została odnotowana w bazie.`,
-            `Purchase successful (BETA SIMULATION)! Received ${tokensReceived.toLocaleString()} $SLX. Transaction logged in the database.`
+            `Zakup udany ! Otrzymałeś ${tokensReceived.toLocaleString()} $SLX. Transakcja została odnotowana w bazie.`,
+            `Purchase successful ! Received ${tokensReceived.toLocaleString()} $SLX. Transaction logged in the database.`
           )
         );
         fetchPresaleStatus();
@@ -476,9 +477,12 @@ export const PresaleSection: React.FC = () => {
                 : t('PRZEDSPRZEDAŻ ZAKOŃCZONA', 'PRESALE HAS ENDED')
           }
         </div>
-        <h2 className="font-display text-3xl md:text-5xl tracking-[2px] text-white uppercase">
+        <h2 className="font-display text-3xl md:text-5xl tracking-[2px] text-white uppercase flex items-center justify-center gap-4">
           {t('ZABEZPIECZONY ', 'SECURE ')}
-          <span className="text-g text-shadow-[0_0_8px_rgba(0,255,136,0.4)]">{t('LAUNCHPAD PRZEDSPRZEDAŻY', 'PRESALE LAUNCHPAD')}</span>
+          <span className="text-g text-shadow-[0_0_8px_rgba(0,255,136,0.4)] flex items-center gap-3">
+            {t('LAUNCHPAD', 'LAUNCHPAD')}
+            <SolaxyEmoticon className="w-10 h-10 md:w-12 md:h-12" />
+          </span>
         </h2>
         <p className="text-xs sm:text-sm text-[#c8e6d2]/50 max-w-[620px] mx-auto mt-4 leading-relaxed">
           {t(
@@ -827,7 +831,7 @@ export const PresaleSection: React.FC = () => {
               ) : (
                 <>
                   <Zap className="w-3.5 h-3.5 text-cyan" />
-                  {isDemoMode ? t('WYKONAJ SYMULOWANY SWAP (BETA)', 'EXECUTE SIMULATED SWAP (BETA)') : t('ZATWIERDŹ SWAP (SOLANA)', 'EXECUTE PRESALE BUY')}
+                  {isDemoMode ? t('ZATWIERDŹ SWAP (SOLANA)', 'EXECUTE PRESALE BUY') : t('ZATWIERDŹ SWAP (SOLANA)', 'EXECUTE PRESALE BUY')}
                 </>
               )}
             </button>
@@ -980,7 +984,7 @@ export const PresaleSection: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-6 h-6 rounded bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 text-yellow-500 text-[10px] font-bold">SOL</div>
                       <div>
-                        <span className="text-xs font-bold text-yellow-400 block">{t('Beta Simulation Wallet', 'Beta Simulation Wallet')}</span>
+                        <span className="text-xs font-bold text-yellow-400 block">{t('Solaxy Cloud Wallet', 'Solaxy Cloud Wallet')}</span>
                         <span className="text-[8.5px] text-yellow-500/60 block">{t('Bezpośrednia symulacja bez wtyczki', 'Direct simulation without any extension')}</span>
                       </div>
                     </div>

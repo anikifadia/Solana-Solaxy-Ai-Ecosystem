@@ -8,6 +8,7 @@ import {
 import { useLanguage } from '../LanguageContext';
 import TokenLifecyclePipeline from './TokenLifecyclePipeline';
 import TokenHDIcon from './TokenHDIcon';
+import { SolaxyEmoticon } from './SolaxyLogo';
 
 interface GeneratedToken {
   name: string;
@@ -371,12 +372,13 @@ export default function AITokenGenerator() {
                 <button
                   onClick={() => handleGenerate()}
                   disabled={!prompt.trim()}
-                  className={`py-3 px-6 text-xs tracking-[2px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-2 interactive-cursor whitespace-nowrap ${
+                  className={`py-3 px-6 text-xs tracking-[2px] font-bold uppercase transition-all duration-300 flex items-center justify-center gap-3 interactive-cursor whitespace-nowrap ${
                     prompt.trim() 
                       ? 'bg-g text-black hover:bg-g/90 hover:shadow-[0_0_15px_rgba(0,255,136,0.5)]'
                       : 'bg-white/5 text-white/30 cursor-not-allowed'
                   }`}
                 >
+                  <SolaxyEmoticon className="w-5 h-5 opacity-90" />
                   {t('FORGUJ PROMPT', 'FORGE PROMPT')} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

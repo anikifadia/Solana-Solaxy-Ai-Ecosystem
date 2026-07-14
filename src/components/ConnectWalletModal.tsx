@@ -16,6 +16,45 @@ export default function ConnectWalletModal({ isOpen, onClose }: ConnectWalletMod
   const [activeTab, setActiveTab] = useState<'connect' | 'info'>(isConnected ? 'info' : 'connect');
   const [selectedWallet, setSelectedWallet] = useState<WalletType | null>(null);
   const [connectionStep, setConnectionStep] = useState<string>('');
+  const [walletBalances, setWalletBalances] = useState<Record<string, number>>({});
+  const [solPrice, setSolPrice] = useState(182.50);
+
+  // Sync wallet balances
+  React.useEffect(() => {
+    const fetchBalances = () => {
+      if (isConnected && walletAddress) {
+        const key = `solaxy_wallet_balances_${walletAddress}`;
+        const saved = localStorage.getItem(key);
+        let parsed = { '$SLX': 5000, 'SOL': 12.45 }; // Default with some SOL
+        if (saved) {
+          try {
+            parsed = { ...parsed, ...JSON.parse(saved) };
+          } catch (e) {}
+        }
+        setWalletBalances(parsed);
+      } else {
+        setWalletBalances({});
+      }
+    };
+    
+    const fetchPrices = async () => {
+      try {
+        const res = await fetch('/api/market/prices');
+        if (res.ok) {
+          const data = await res.json();
+          const solData = data.find((item: any) => item.symbol === 'SOLUSDT');
+          if (solData) {
+            setSolPrice(parseFloat(solData.lastPrice));
+          }
+        }
+      } catch (e) {}
+    };
+
+    fetchBalances();
+    fetchPrices();
+    window.addEventListener('solaxy-balance-updated', fetchBalances);
+    return () => window.removeEventListener('solaxy-balance-updated', fetchBalances);
+  }, [isConnected, walletAddress]);
 
   // Automatically switch tabs if connection status changes
   React.useEffect(() => {
@@ -247,6 +286,52 @@ export default function ConnectWalletModal({ isOpen, onClose }: ConnectWalletMod
                         {formatAddress(walletAddress || '')}
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                {/* Wallet Balances Section */}
+                <div className="space-y-2">
+                  <div className="text-[10px] text-white/50 font-bold uppercase tracking-[1px] mb-2 flex justify-between items-center">
+                    <span>{t('Twoje Salda', 'Your Balances')}</span>
+                    <span className="text-g text-[9px]">{t('LIVE PORTFOLIO', 'LIVE PORTFOLIO')}</span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    {Object.entries(walletBalances).map(([token, amount]) => {
+                      const isSol = token === 'SOL';
+                      const tokenPrice = isSol ? solPrice : 1.50; // $SLX presale price
+                      const numAmount = Number(amount) || 0;
+                      const totalValue = numAmount * Number(tokenPrice);
+                      
+                      return (
+                        <div key={token} className="p-3 border border-white/5 bg-black/40 hover:bg-white/5 transition-colors rounded flex items-center justify-between group cursor-default">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] border ${isSol ? 'bg-[#9945FF]/10 text-[#14F195] border-[#14F195]/20' : 'bg-g/10 text-g border-g/20'}`}>
+                              {token.substring(0, 4).replace('$', '')}
+                            </div>
+                            <div>
+                              <div className="text-xs font-bold text-white font-mono">{token}</div>
+                              <div className="text-[9px] text-white/50 font-mono mt-0.5">
+                                ${Number(tokenPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="text-right">
+                            <div className="text-sm text-white font-bold font-mono">
+                              {numAmount.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                            </div>
+                            <div className="text-[10px] text-g font-bold font-mono mt-0.5 group-hover:text-cyan transition-colors">
+                              ~${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                    {Object.keys(walletBalances).length === 0 && (
+                      <div className="p-4 border border-white/5 bg-black/40 rounded text-center text-[10px] text-white/40">
+                        {t('Portfel jest pusty', 'Wallet is empty')}
+                      </div>
+                    )}
                   </div>
                 </div>
 

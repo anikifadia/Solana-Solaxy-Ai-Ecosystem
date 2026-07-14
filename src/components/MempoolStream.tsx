@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { RefreshCw, CheckCircle2, ArrowRightLeft, ShieldAlert } from 'lucide-react';
 import { useLanguage } from '../LanguageContext';
+import { SolaxyLogo } from './SolaxyLogo';
 import SlicedAsset, { SlicedAssetKey } from './SlicedAsset';
 
 const CHIBI_AVATARS: SlicedAssetKey[] = [
@@ -132,8 +133,8 @@ export default function MempoolStream() {
       </div>
 
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-g animate-ping" />
+        <div className="flex items-center gap-3">
+          <SolaxyLogo className="w-6 h-6" withGlow={false} />
           <span className="text-[10px] tracking-[4px] uppercase text-white font-bold">SOLAX LIVE LEDGER</span>
         </div>
         <button 
