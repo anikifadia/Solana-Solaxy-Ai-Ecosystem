@@ -299,8 +299,7 @@ export default function ConnectWalletModal({ isOpen, onClose }: ConnectWalletMod
                     {Object.entries(walletBalances).map(([token, amount]) => {
                       const isSol = token === 'SOL';
                       const tokenPrice = isSol ? solPrice : 1.50; // $SLX presale price
-                      const numAmount = Number(amount) || 0;
-                      const totalValue = numAmount * Number(tokenPrice);
+                      const totalValue = amount * tokenPrice;
                       
                       return (
                         <div key={token} className="p-3 border border-white/5 bg-black/40 hover:bg-white/5 transition-colors rounded flex items-center justify-between group cursor-default">
@@ -311,14 +310,14 @@ export default function ConnectWalletModal({ isOpen, onClose }: ConnectWalletMod
                             <div>
                               <div className="text-xs font-bold text-white font-mono">{token}</div>
                               <div className="text-[9px] text-white/50 font-mono mt-0.5">
-                                ${Number(tokenPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                ${tokenPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </div>
                             </div>
                           </div>
                           
                           <div className="text-right">
                             <div className="text-sm text-white font-bold font-mono">
-                              {numAmount.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+                              {amount.toLocaleString(undefined, { maximumFractionDigits: 4 })}
                             </div>
                             <div className="text-[10px] text-g font-bold font-mono mt-0.5 group-hover:text-cyan transition-colors">
                               ~${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

@@ -803,6 +803,7 @@ export default function MiningStakingForge() {
                 </div>
               ) : (
                 <div className="bg-yellow-500/10 border border-yellow-500/20 p-3.5 rounded text-xs leading-relaxed text-white/70">
+                  <div className="text-[9px] text-yellow-500 font-bold uppercase tracking-[1px] mb-1">{t('WERSJA BETA', 'BETA VERSION')}</div>
                   {t('Zaloguj się na węzeł po prawej w zakładce „Górnictwo”, aby stakować własne zarobione tokeny i zyskać bonus do hashrate!', 'Log in as a miner in the "Mining" tab to stake your earned tokens and gain a real-time hashrate bonus!')}
                 </div>
               )}
@@ -932,9 +933,9 @@ export default function MiningStakingForge() {
           ) : (
             <button 
               className="w-full py-4 border border-g text-g font-bold tracking-[4px] uppercase text-xs hover:bg-g/15 hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] transition-all duration-300 interactive-cursor"
-              onClick={() => alert(t('Zarejestruj się / zaloguj na konto węzła po prawej, aby stakować własny wykopany plon!', 'Register/login as a node on the right to stake your own mined balance!'))}
+              onClick={() => alert(t('W wersji Beta stakowanie jest symulowane. Zarejestruj się / zaloguj na konto węzła po prawej, aby stakować własny wykopany plon!', 'Staking simulated in Beta version. Register/login as a node on the right to stake your own mined balance!'))}
             >
-              {t('DEPOZYT W SEJFIE STAKOWANIA', 'DEPOSIT TO STAKING VAULT')}
+              {t('DEPOZYT W SEJFIE STAKOWANIA (BETA)', 'DEPOSIT TO STAKING VAULT (BETA)')}
             </button>
           )}
         </div>

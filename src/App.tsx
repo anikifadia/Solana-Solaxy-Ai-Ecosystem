@@ -11,7 +11,6 @@ import BackgroundEffects from './components/BackgroundEffects';
 import QuantumLightningCursor from './components/QuantumLightningCursor';
 import SlicedAsset from './components/SlicedAsset';
 import { useLanguage } from './LanguageContext';
-import { SolaxyLogo, SolaxyEmoticon } from './components/SolaxyLogo';
 import { useWallet } from './WalletContext';
 import ConnectWalletModal from './components/ConnectWalletModal';
 
@@ -643,7 +642,7 @@ export default function App() {
           onClick={() => { setCurrentPage('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
           className="flex items-center gap-3 decoration-none group interactive-cursor bg-transparent border-none cursor-pointer p-0 text-left"
         >
-          <SolaxyLogo className="w-10 h-10" />
+          <SlicedAsset asset="app-icon" className="w-8 h-8 rounded border border-g/20 animate-[pulse_3s_ease-in-out_infinite]" />
           <span className="logo font-display text-2xl md:text-3xl tracking-[4px] text-white text-shadow-[0_0_10px_rgba(255,255,255,0.1)] group-hover:text-g group-hover:text-shadow-[0_0_12px_#00ff88] transition-all duration-300">
             SOLAXY
           </span>
@@ -1002,11 +1001,8 @@ export default function App() {
 
       {/* ══ FOOTER ══ */}
       <footer className="relative z-[5] py-8 px-6 md:px-12 border-t border-g/10 bg-[#000208]/90 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <SolaxyEmoticon className="w-8 h-8" />
-          <div className="logo font-display text-xl md:text-2xl tracking-[5px] text-g text-shadow-[0_0_10px_rgba(0,255,136,0.4)]">
-            SOLA<span className="text-r text-shadow-[0_0_8px_rgba(255,26,74,0.4)]">X</span>
-          </div>
+        <div className="logo font-display text-xl md:text-2xl tracking-[5px] text-g text-shadow-[0_0_10px_rgba(0,255,136,0.4)]">
+          SOLA<span className="text-r text-shadow-[0_0_8px_rgba(255,26,74,0.4)]">X</span>
         </div>
 
         <div className="text-[9px] tracking-[2px] text-white/30 text-center sm:text-left">
