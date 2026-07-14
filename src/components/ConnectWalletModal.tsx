@@ -25,7 +25,7 @@ export default function ConnectWalletModal({ isOpen, onClose }: ConnectWalletMod
       if (isConnected && walletAddress) {
         const key = `solaxy_wallet_balances_${walletAddress}`;
         const saved = localStorage.getItem(key);
-        let parsed = { '$SLX': 5000, 'SOL': 12.45 }; // Default with some SOL
+        let parsed = { '$SLX': 5000 }; 
         if (saved) {
           try {
             parsed = { ...parsed, ...JSON.parse(saved) };
@@ -298,7 +298,15 @@ export default function ConnectWalletModal({ isOpen, onClose }: ConnectWalletMod
                   <div className="grid grid-cols-1 gap-2">
                     {Object.entries(walletBalances).map(([token, amount]) => {
                       const isSol = token === 'SOL';
-                      const tokenPrice = isSol ? solPrice : 1.50; // $SLX presale price
+                      let tokenPrice = 0;
+                      if (isSol) tokenPrice = solPrice;
+                      else if (token === '$SLX' || token === 'SLX') tokenPrice = 0.048; // Updated to match App.tsx TICKER_DATA
+                      else if (token === 'USDC' || token === 'USDT') tokenPrice = 1.0;
+                      else if (token === 'BONK') tokenPrice = 0.0000312;
+                      else if (token === 'WIF') tokenPrice = 2.18;
+                      else if (token === 'JUP') tokenPrice = 1.12;
+                      else tokenPrice = 1.5; // fallback
+                      
                       const totalValue = amount * tokenPrice;
                       
                       return (
@@ -310,7 +318,7 @@ export default function ConnectWalletModal({ isOpen, onClose }: ConnectWalletMod
                             <div>
                               <div className="text-xs font-bold text-white font-mono">{token}</div>
                               <div className="text-[9px] text-white/50 font-mono mt-0.5">
-                                ${tokenPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                ${tokenPrice < 0.01 ? tokenPrice.toFixed(6) : tokenPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </div>
                             </div>
                           </div>

@@ -320,23 +320,37 @@ export default function App() {
     };
   }, []);
 
-  const reloadBalances = () => {
+  const reloadBalances = async () => {
     if (isConnected && walletAddress) {
       const key = `solaxy_wallet_balances_${walletAddress}`;
       const saved = localStorage.getItem(key);
+      let currentBals: Record<string, number> = { '$SLX': 5000 };
       if (saved) {
         try {
-          setWalletBalances(JSON.parse(saved));
+          currentBals = { ...currentBals, ...JSON.parse(saved) };
         } catch (e) {
           console.error("Failed to parse balances:", e);
         }
-      } else {
-        const initialBalances: Record<string, number> = {
-          '$SLX': 5000,
-        };
-        setWalletBalances(initialBalances);
-        localStorage.setItem(key, JSON.stringify(initialBalances));
       }
+      
+      // Update UI with local balances immediately
+      setWalletBalances(currentBals);
+      localStorage.setItem(key, JSON.stringify(currentBals));
+
+      // Fetch real SOL balance
+      import('./utils/solana').then(async ({ fetchRealSolBalance }) => {
+        const result = await fetchRealSolBalance(walletAddress);
+        if (result !== null) {
+          setWalletBalances(prev => {
+            const updated = { ...prev, 'SOL': result.sol, ...result.tokens };
+            localStorage.setItem(key, JSON.stringify(updated));
+            return updated;
+          });
+          // Dispatch event so other components sync
+          window.dispatchEvent(new Event('solaxy-balance-updated'));
+        }
+      }).catch(console.error);
+
     } else {
       setWalletBalances({});
     }
