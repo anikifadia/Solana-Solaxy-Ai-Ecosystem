@@ -16,7 +16,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (saved === 'en' || saved === 'pl') {
       return saved as Language;
     }
-    return 'pl'; // default to Polish
+    return 'en'; // default to English
   });
 
   const setLanguage = (lang: Language) => {

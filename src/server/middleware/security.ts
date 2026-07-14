@@ -33,7 +33,7 @@ export const apiRateLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   validate: { trustProxy: false }, // Suppress proxy validation warnings in the container environment
   message: {
-    error: "Zbyt wiele żądań z tego adresu IP. Spróbuj ponownie za 15 minut."
+    error: "Too many requests from this IP address. Please try again in 15 minutes."
   }
 });
 
@@ -50,7 +50,7 @@ export const validateRequest = (schema: ZodSchema) => {
     } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({
-          error: "Błąd walidacji danych wejściowych.",
+          error: "Input data validation error.",
           details: error.issues.map(err => `${err.path.join(".")}: ${err.message}`)
         });
       }
@@ -69,7 +69,7 @@ export const errorHandler = (
   console.error("[Central Server Error]:", err);
 
   const statusCode = err.status || err.statusCode || 500;
-  const message = err.message || "Wystąpił nieoczekiwany błąd serwera.";
+  const message = err.message || "An unexpected server error occurred.";
 
   return res.status(statusCode).json({
     error: message,

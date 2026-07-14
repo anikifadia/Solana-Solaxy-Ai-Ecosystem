@@ -38,13 +38,13 @@ export async function verifySolanaTx(
     if (!txInfo) {
       return { 
         verified: false, 
-        error: "Transakcja nie została jeszcze odnaleziona w sieci Solana (może potrwać kilka sekund)." + 
-          (lastRpcError ? ` (Ostatni błąd RPC: ${lastRpcError.message})` : "")
+        error: "Transaction not yet found on the Solana network (it may take a few seconds)." + 
+          (lastRpcError ? ` (Last RPC error: ${lastRpcError.message})` : "")
       };
     }
 
     if (txInfo.meta?.err) {
-      return { verified: false, error: "Ta transakcja zakończyła się błędem na blockchainie." };
+      return { verified: false, error: "This transaction failed on the blockchain." };
     }
 
     const accountKeys = txInfo.transaction.message.accountKeys;
@@ -77,7 +77,7 @@ export async function verifySolanaTx(
     if (!foundReceiver) {
       return { 
         verified: false, 
-        error: `Transakcja nie zawiera transferu środków na adres przedsprzedaży (${expectedReceiver}).` 
+        error: `Transaction does not contain a transfer to the presale address (${expectedReceiver}).` 
       };
     }
 
@@ -86,7 +86,7 @@ export async function verifySolanaTx(
     if (expectedAmountSol && Math.abs(solAmount - expectedAmountSol) > 0.05) {
       return { 
         verified: false, 
-        error: `Niezgodność kwoty: transakcja opiewa na ${solAmount} SOL, a oczekiwano ${expectedAmountSol} SOL.` 
+        error: `Amount mismatch: transaction is for ${solAmount} SOL, but expected ${expectedAmountSol} SOL.` 
       };
     }
 
@@ -106,7 +106,7 @@ export async function verifySolanaTx(
     console.error("Error in verifySolanaTx service:", e);
     return { 
       verified: false, 
-      error: "Wystąpił błąd podczas odpytywania sieci Solana RPC: " + e.message 
+      error: "An error occurred querying the Solana RPC network: " + e.message 
     };
   }
 }
